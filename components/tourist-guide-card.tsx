@@ -32,21 +32,19 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
     const fetchAvailability = async () => {
       try {
         setLoadingAvailability(true);
+        // Use .limit(1) instead of .single() to avoid 406 error when no data exists
         const { data, error } = await supabase
           .from('guide_availability')
           .select('*')
           .eq('guide_id', guide.id)
           .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+          .limit(1);
 
-        if (error) {
-          console.error('Supabase error fetching availability:', error);
-        } else if (data) {
-          setAvailability(data as GuideAvailability);
+        // data will be an array, get first item or null
+        if (!error && data && data.length > 0) {
+          setAvailability(data[0] as GuideAvailability);
         }
-      } catch (err) {
-        console.error('Error fetching availability:', err);
+        // If no data or error, availability stays null - this is handled in UI
       } finally {
         setLoadingAvailability(false);
       }
@@ -72,7 +70,7 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
           setIsSaved(false);
         }
       } catch (err) {
-        console.error('Error checking save status:', err);
+        // Error checking save status - set as not saved
       } finally {
         setCheckingSaveStatus(false);
       }
@@ -170,7 +168,7 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              priority={false}
+              priority={true}
             />
           ) : (
             <div className="text-center text-muted-foreground">

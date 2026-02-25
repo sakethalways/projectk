@@ -111,16 +111,12 @@ function TouristSignupContent() {
       setError('Please enter a valid email');
       return false;
     }
-    if (!formData.password || formData.password.length < 8) {
-      setError('Password must be at least 8 characters');
+    if (!formData.password || formData.password.length < 5) {
+      setError('Password must be at least 5 characters');
       return false;
     }
-    if (!/[A-Z]/.test(formData.password)) {
-      setError('Password must contain at least one uppercase letter');
-      return false;
-    }
-    if (!/[0-9]/.test(formData.password)) {
-      setError('Password must contain at least one number');
+    if (formData.password.length > 128) {
+      setError('Password must be less than 128 characters');
       return false;
     }
     if (!formData.phone_number.trim() || formData.phone_number.length < 10) {
@@ -426,12 +422,12 @@ function TouristSignupContent() {
                   type="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Min 8 chars, 1 uppercase, 1 number"
+                  placeholder="Min 5 characters"
                   className="text-sm"
                   disabled={loading}
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Must be at least 8 characters with 1 uppercase letter and 1 number
+                  Must be at least 5 characters
                 </p>
               </div>
 

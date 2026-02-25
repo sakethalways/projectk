@@ -77,7 +77,7 @@ export default function GuideItineraryManager({ guideId, userId }: GuideItinerar
       const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
       return urlData.publicUrl;
     } catch (err) {
-      console.error('Image upload error:', err);
+      // Error uploading image
       throw err;
     }
   };

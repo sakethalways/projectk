@@ -90,18 +90,20 @@ export default function BookGuideModal({
         .select('*')
         .eq('guide_id', guide.id)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
 
-      if (availError || !availData) {
-        setError('Guide availability not set');
+      // Handle case where no availability is set
+      if (availError || !availData || availData.length === 0) {
+        setError('Guide has not set availability yet');
+        setStep('availability-check');
         return;
       }
 
-      setAvailability(availData);
+      const availRecord = availData[0];
+      setAvailability(availRecord);
 
       // If guide is on leave, show error
-      if (!availData.is_available) {
+      if (!availRecord.is_available) {
         setError('Guide is on leave. Please try another guide.');
         setStep('availability-check');
         return;
@@ -114,8 +116,9 @@ export default function BookGuideModal({
         .eq('guide_id', guide.id)
         .order('created_at', { ascending: false });
 
-      if (itinError || !itineraryData) {
-        setError('Failed to load itineraries');
+      if (itinError || !itineraryData || itineraryData.length === 0) {
+        setError('Guide has not created any itineraries yet');
+        setStep('availability-check');
         return;
       }
 
@@ -250,27 +253,36 @@ export default function BookGuideModal({
           {step === 'itinerary-selection' && !loading && (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">Selected: {formatDate(selectedDate)}</p>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {itineraries.map((itinerary) => (
-                  <button
-                    key={itinerary.id}
-                    onClick={() => handleItinerarySelect(itinerary)}
-                    className="w-full p-3 border border-border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 text-left transition"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-semibold text-sm">
-                        {itinerary.number_of_days} Days
-                      </span>
-                      <Badge className="bg-blue-100 text-blue-800 text-xs">
-                        ₹{itinerary.price} {itinerary.price_type === 'per_day' ? '/ day' : '/ trip'}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {itinerary.description}
-                    </p>
-                  </button>
-                ))}
-              </div>
+              {itineraries.length === 0 ? (
+                <Alert className="bg-yellow-50 border-yellow-200">
+                  <AlertCircle className="h-4 w-4 text-yellow-600" />
+                  <AlertDescription className="text-yellow-800">
+                    No itineraries available for this guide
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {itineraries.map((itinerary) => (
+                    <button
+                      key={itinerary.id}
+                      onClick={() => handleItinerarySelect(itinerary)}
+                      className="w-full p-3 border border-border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 text-left transition"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-semibold text-sm">
+                          {itinerary.number_of_days} Days
+                        </span>
+                        <Badge className="bg-blue-100 text-blue-800 text-xs">
+                          ₹{itinerary.price} {itinerary.price_type === 'per_day' ? '/ day' : '/ trip'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {itinerary.description}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -335,7 +347,7 @@ export default function BookGuideModal({
               </>
             )}
 
-            {step === 'itinerary-selection' && (
+            {step === 'itinerary-selection' && itineraries.length > 0 && (
               <Button
                 onClick={() => setStep('date-selection')}
                 variant="outline"

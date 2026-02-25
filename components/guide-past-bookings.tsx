@@ -85,17 +85,6 @@ export default function GuidePastBookings() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-foreground">
-          Past Trips
-          {bookings.length > 0 && (
-            <Badge variant="outline" className="ml-3">{bookings.length} total</Badge>
-          )}
-        </h2>
-        <p className="text-muted-foreground mt-1">Your tour history</p>
-      </div>
-
       {/* Error */}
       {error && (
         <Alert className="bg-red-50 border-red-200">

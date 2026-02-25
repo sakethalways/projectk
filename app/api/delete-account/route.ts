@@ -2,16 +2,37 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  secureLog,
+  extractBearerToken,
+  validatePassword,
+  isRateLimited,
+} from '@/lib/security-utils';
+import { errorResponses, handleAPIError } from '@/lib/api-error-handler';
 
 export async function POST(request: NextRequest) {
   try {
-    const { password } = await request.json();
+    // Rate limiting - sensitive operation
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    if (isRateLimited(`delete_account_${ip}`, 5)) {
+      secureLog.warn(`High rate of delete attempts from ${ip.substring(0, 10)}`);
+      return errorResponses.rateLimited();
+    }
 
-    if (!password) {
-      return NextResponse.json(
-        { error: 'Password is required' },
-        { status: 400 }
-      );
+    let password: string;
+    try {
+      const body = await request.json();
+      password = body.password;
+    } catch (e) {
+      return errorResponses.validation('Invalid JSON format');
+    }
+
+    if (!password || typeof password !== 'string' || password.length === 0) {
+      return errorResponses.validation('Password is required');
+    }
+
+    if (password.length > 128) {
+      return errorResponses.validation('Invalid password format');
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -33,48 +54,45 @@ export async function POST(request: NextRequest) {
 
     // Get auth header
     const authHeader = request.headers.get('Authorization');
-    if (!authHeader) {
-      return NextResponse.json(
-        { error: 'Authorization header required' },
-        { status: 401 }
-      );
+    if (!authHeader || typeof authHeader !== 'string') {
+      return errorResponses.missingAuthHeader();
     }
 
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Invalid authorization header' },
-        { status: 401 }
-      );
+    const { valid, token } = extractBearerToken(authHeader);
+    if (!valid || !token) {
+      return errorResponses.invalidToken();
     }
 
     // Verify user and get email
     const { data: { user: authUser }, error: userError } = await supabase.auth.getUser(token);
     if (userError || !authUser) {
-      return NextResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 401 }
-      );
+      secureLog.warn('Failed auth user retrieval');
+      return errorResponses.invalidToken();
+    }
+
+    if (!authUser.id || typeof authUser.id !== 'string') {
+      return errorResponses.invalidToken();
     }
 
     // Verify password by attempting sign in
+    if (!authUser.email) {
+      secureLog.warn('Auth user missing email');
+      return errorResponses.invalidToken();
+    }
+
     try {
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: authUser.email || '',
+        email: authUser.email,
         password: password,
       });
 
       if (signInError) {
-        return NextResponse.json(
-          { error: 'Invalid password' },
-          { status: 401 }
-        );
+        secureLog.warn('Password verification failed');
+        return errorResponses.validation('Invalid password');
       }
     } catch (err) {
-      return NextResponse.json(
-        { error: 'Password verification failed' },
-        { status: 401 }
-      );
+      secureLog.error('Password verification error');
+      return errorResponses.validation('Password verification failed');
     }
 
     // Get user role
@@ -102,8 +120,7 @@ export async function POST(request: NextRequest) {
         .eq('tourist_id', authUser.id);
 
       if (savedError) {
-        console.error('Error deleting saved guides:', savedError);
-        // Continue anyway, don't block account deletion
+        secureLog.warn('Warning: Could not delete saved guides (non-blocking)');
       }
 
       // Step 2: Delete all bookings (CASCADE will handle ratings_reviews)
@@ -113,8 +130,7 @@ export async function POST(request: NextRequest) {
         .eq('tourist_id', authUser.id);
 
       if (bookingError) {
-        console.error('Error deleting bookings:', bookingError);
-        // Continue anyway
+        secureLog.warn('Warning: Could not delete bookings (non-blocking)');
       }
 
       // Step 3: Delete any orphaned ratings_reviews (in case some exist independently)
@@ -124,8 +140,7 @@ export async function POST(request: NextRequest) {
         .eq('tourist_id', authUser.id);
 
       if (ratingError) {
-        console.error('Error deleting ratings:', ratingError);
-        // Continue anyway
+        secureLog.warn('Warning: Could not delete ratings (non-blocking)');
       }
     } else if (userRole === 'guide') {
       // Step 1: Delete all guide itineraries
@@ -142,8 +157,7 @@ export async function POST(request: NextRequest) {
           .eq('guide_id', guideData.id);
 
         if (itineraryError) {
-          console.error('Error deleting itineraries:', itineraryError);
-          // Continue anyway
+          secureLog.warn('Warning: Could not delete itineraries (non-blocking)');
         }
 
         // Step 2: Delete all bookings for this guide
@@ -153,8 +167,7 @@ export async function POST(request: NextRequest) {
           .eq('guide_id', guideData.id);
 
         if (bookingError) {
-          console.error('Error deleting guide bookings:', bookingError);
-          // Continue anyway
+          secureLog.warn('Warning: Could not delete guide bookings (non-blocking)');
         }
 
         // Step 3: Delete all ratings_reviews for this guide
@@ -164,8 +177,7 @@ export async function POST(request: NextRequest) {
           .eq('guide_id', guideData.id);
 
         if (ratingError) {
-          console.error('Error deleting guide ratings:', ratingError);
-          // Continue anyway
+          secureLog.warn('Warning: Could not delete guide ratings (non-blocking)');
         }
 
         // Step 4: Delete the guide record
@@ -175,8 +187,7 @@ export async function POST(request: NextRequest) {
           .eq('id', guideData.id);
 
         if (guideError) {
-          console.error('Error deleting guide record:', guideError);
-          // Continue anyway
+          secureLog.warn('Warning: Could not delete guide record (non-blocking)');
         }
       }
     }
@@ -188,39 +199,26 @@ export async function POST(request: NextRequest) {
       .eq('id', authUser.id);
 
     if (userDeleteError) {
-      console.error('Error deleting user record:', userDeleteError);
-      // Continue to auth deletion anyway
+      secureLog.warn('Warning: Could not delete user record (non-blocking)');
     }
 
     // Step 7: Delete auth user
     const { error: authDeleteError } = await supabase.auth.admin.deleteUser(authUser.id);
 
     if (authDeleteError) {
-      console.error('Error deleting auth user:', authDeleteError);
-      return NextResponse.json(
-        {
-          error: 'Failed to delete account',
-          details: authDeleteError.message,
-        },
-        { status: 500 }
-      );
+      secureLog.error('Auth user deletion failed');
+      return errorResponses.internalError();
     }
 
-    // Success!
+    // Success! Return safe response (NO redirect path - handled by client)
     return NextResponse.json(
       {
-        message: 'Account successfully deleted',
-        redirectTo: '/login',
+        success: true,
+        message: 'Account deletion processed',
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error in delete-account API:', error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
+    return handleAPIError(error, { action: 'delete_account' });
   }
 }

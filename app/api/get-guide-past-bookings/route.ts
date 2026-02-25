@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
     if (touristIds.length > 0) {
       const { data: profiles } = await serviceSupabase
         .from('tourist_profiles')
-        .select('id, user_id, name, phone_number, location, profile_picture_url')
+        .select('id, user_id, name, phone_number, location, profile_picture_url, email')
         .in('user_id', touristIds);
       
       touristProfiles = profiles || [];

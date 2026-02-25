@@ -47,10 +47,10 @@ export default function GuideBookingRequests() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Bookings received in component:', data.bookings);
+
           setBookings(data.bookings || []);
         } else {
-          console.error('Response error:', response.status);
+
           setError('Failed to load booking requests');
         }
       } catch (err) {
@@ -111,17 +111,6 @@ export default function GuideBookingRequests() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-foreground">
-          Booking Requests
-          {bookings.length > 0 && (
-            <Badge className="ml-3 bg-yellow-100 text-yellow-800">{bookings.length} pending</Badge>
-          )}
-        </h2>
-        <p className="text-muted-foreground mt-1">Review and respond to tour booking requests</p>
-      </div>
-
       {/* Error */}
       {error && (
         <Alert className="bg-red-50 border-red-200">

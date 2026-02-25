@@ -6,12 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase-client';
-import { Eye, Edit } from 'lucide-react';
-import GuideAvailabilityManager from '@/components/guide-availability-manager';
-import GuideItineraryManager from '@/components/guide-itinerary-manager';
-import GuideBookingRequests from '@/components/guide-booking-requests';
-import GuideConfirmedBookings from '@/components/guide-confirmed-bookings';
-import GuidePastBookings from '@/components/guide-past-bookings';
+import { Eye, Edit, User } from 'lucide-react';
+
 import GuideSidebar from '@/components/guide-sidebar';
 import type { Guide } from '@/lib/supabase-client';
 
@@ -109,6 +105,16 @@ export default function GuideDashboard() {
 
       {/* Main Content */}
       <main className="flex-1 w-full lg:w-0 px-4 sm:px-6 py-6 sm:py-10 max-w-5xl mx-auto">
+        {/* Profile Button in Top Right */}
+        <div className="flex justify-end mb-6">
+          <Link href="/guide/account">
+            <Button variant="outline" size="sm" className="gap-2">
+              <User className="w-4 h-4" />
+              Profile
+            </Button>
+          </Link>
+        </div>
+
         {/* Welcome Section */}
         <Card className="border border-border p-5 sm:p-6 lg:p-8 mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200 dark:border-blue-800">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 sm:mb-2">Welcome, {guide.name}! 👋</h2>
@@ -192,34 +198,7 @@ export default function GuideDashboard() {
           </Link>
         </div>
 
-        {/* Availability & Itinerary Section */}
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
-          {/* Availability Manager */}
-          <GuideAvailabilityManager guideId={guide.id} userId={guide.user_id} />
 
-          {/* Itinerary Manager */}
-          <div>
-            <GuideItineraryManager guideId={guide.id} userId={guide.user_id} />
-          </div>
-        </div>
-
-        {/* Bookings Section */}
-        <div className="mt-10 sm:mt-12 space-y-8">
-          {/* Booking Requests */}
-          <div>
-            <GuideBookingRequests />
-          </div>
-
-          {/* Confirmed Bookings */}
-          <div>
-            <GuideConfirmedBookings />
-          </div>
-
-          {/* Past Bookings */}
-          <div>
-            <GuidePastBookings />
-          </div>
-        </div>
       </main>
     </div>
   );

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { LogOut, Menu, X, LayoutDashboard, User, Edit, Home, Star } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, User, Edit, Home, Star, Clock, CheckCircle2, History, Calendar, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface GuideSidebarProps {
@@ -23,19 +23,44 @@ export default function GuideSidebar({ onLogout, guideName }: GuideSidebarProps)
       icon: LayoutDashboard,
     },
     {
-      href: '/guide/profile',
-      label: 'Profile',
-      icon: User,
+      section: 'Bookings',
+      items: [
+        {
+          href: '/guide/booking-requests',
+          label: 'Booking Requests',
+          icon: Clock,
+        },
+        {
+          href: '/guide/confirmed-bookings',
+          label: 'Confirmed Bookings',
+          icon: CheckCircle2,
+        },
+        {
+          href: '/guide/past-bookings',
+          label: 'Past Trips',
+          icon: History,
+        },
+        {
+          href: '/guide/my-ratings',
+          label: 'Ratings',
+          icon: Star,
+        },
+      ],
     },
     {
-      href: '/guide/edit-profile',
-      label: 'Edit Profile',
-      icon: Edit,
-    },
-    {
-      href: '/guide/my-ratings',
-      label: 'My Ratings',
-      icon: Star,
+      section: 'Management',
+      items: [
+        {
+          href: '/guide/availability',
+          label: 'Availability',
+          icon: Calendar,
+        },
+        {
+          href: '/guide/itinerary',
+          label: 'Itinerary',
+          icon: MapPin,
+        },
+      ],
     },
   ];
 
@@ -66,26 +91,48 @@ export default function GuideSidebar({ onLogout, guideName }: GuideSidebarProps)
 
         {/* Mobile Menu */}
         {isOpen && (
-          <nav className="border-t border-border bg-slate-50 dark:bg-slate-800 px-4 py-4 space-y-2">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-2 rounded-lg transition-colors',
-                    isActive(item.href)
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-medium'
-                      : 'text-muted-foreground hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-foreground'
-                  )}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+          <nav className="border-t border-border bg-slate-50 dark:bg-slate-800 px-4 py-4 space-y-4">
+            {menuItems.map((item: any, idx) => (
+              <div key={idx}>
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 px-4 py-2 rounded-lg transition-colors',
+                      isActive(item.href)
+                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-medium'
+                        : 'text-muted-foreground hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-foreground'
+                    )}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                ) : (
+                  <>
+                    <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{item.section}</p>
+                    <div className="space-y-1">
+                      {item.items.map((subItem: any) => (
+                        <Link
+                          key={subItem.href}
+                          href={subItem.href}
+                          onClick={() => setIsOpen(false)}
+                          className={cn(
+                            'flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm',
+                            isActive(subItem.href)
+                              ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-medium'
+                              : 'text-muted-foreground hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-foreground'
+                          )}
+                        >
+                          <subItem.icon className="w-4 h-4" />
+                          <span>{subItem.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
             <div className="pt-4 border-t border-border">
               <Button
                 onClick={handleLogout}
@@ -115,25 +162,46 @@ export default function GuideSidebar({ onLogout, guideName }: GuideSidebarProps)
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                  isActive(item.href)
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-medium'
-                    : 'text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-foreground'
-                )}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+        <nav className="flex-1 p-4 space-y-6">
+          {menuItems.map((item: any, idx) => (
+            <div key={idx}>
+              {item.href ? (
+                <Link
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                    isActive(item.href)
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-medium'
+                      : 'text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-foreground'
+                  )}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </Link>
+              ) : (
+                <>
+                  <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">{item.section}</p>
+                  <div className="space-y-1">
+                    {item.items.map((subItem: any) => (
+                      <Link
+                        key={subItem.href}
+                        href={subItem.href}
+                        className={cn(
+                          'w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm text-left',
+                          isActive(subItem.href)
+                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-medium'
+                            : 'text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-foreground'
+                        )}
+                      >
+                        <subItem.icon className="w-4 h-4 flex-shrink-0" />
+                        <span>{subItem.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
         </nav>
 
         {/* Logout Button */}

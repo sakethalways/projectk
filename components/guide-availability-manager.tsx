@@ -28,22 +28,22 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
   useEffect(() => {
     const fetchAvailability = async () => {
       try {
+        // Use .limit(1) instead of .single() to avoid 406 error when no data exists
         const { data, error: fetchError } = await supabase
           .from('guide_availability')
           .select('*')
           .eq('guide_id', guideId)
           .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+          .limit(1);
 
-        if (!fetchError && data) {
-          setAvailability(data);
-          setStartDate(data.start_date);
-          setEndDate(data.end_date);
-          setIsAvailable(data.is_available);
+        // data will be an array, get first item
+        if (!fetchError && data && data.length > 0) {
+          const availData = data[0];
+          setAvailability(availData);
+          setStartDate(availData.start_date);
+          setEndDate(availData.end_date);
+          setIsAvailable(availData.is_available);
         }
-      } catch (err) {
-        console.error('Error fetching availability:', err);
       } finally {
         setLoading(false);
       }
@@ -72,7 +72,7 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to update status');
-      console.error(err);
+
     } finally {
       setSaving(false);
     }
@@ -139,7 +139,7 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to save availability');
-      console.error(err);
+
     } finally {
       setSaving(false);
     }
@@ -167,7 +167,7 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to delete availability');
-      console.error(err);
+
     } finally {
       setSaving(false);
     }

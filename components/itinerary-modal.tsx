@@ -147,16 +147,9 @@ export default function ItineraryModal({
         setLoading(true);
         setError(null);
 
-        console.log('Fetching itineraries for guide:', guideId);
-
         const response = await fetch(`/api/get-guide-itinerary?guideId=${guideId}`);
 
         if (!response.ok) {
-          if (response.status === 404) {
-            setError('No itinerary created yet for this guide.');
-            setItineraries([]);
-            return;
-          }
           throw new Error(`API error: ${response.status}`);
         }
 
@@ -168,11 +161,13 @@ export default function ItineraryModal({
           return;
         }
 
-        console.log('Itineraries fetched:', data.itineraries);
         setItineraries(data.itineraries as GuideItinerary[]);
         setSelectedId(data.itineraries[0].id);
       } catch (err) {
-        console.error('Error fetching itineraries:', err);
+        // Only log unexpected errors, not expected edge cases
+        if (err instanceof Error && !err.message.includes('API error')) {
+          console.error('Unexpected error fetching itineraries:', err);
+        }
         setError(err instanceof Error ? err.message : 'Failed to fetch itineraries');
         setItineraries([]);
       } finally {

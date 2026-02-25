@@ -45,10 +45,11 @@ export async function GET(req: Request) {
     }
 
     if (!data || data.length === 0) {
-      // No records found
+      // No records found - return 200 with empty array instead of 404
+      // This is an expected case when guide hasn't created itineraries yet
       return NextResponse.json(
         { itineraries: [], message: 'No itinerary found for this guide' },
-        { status: 404 }
+        { status: 200 }
       );
     }
 

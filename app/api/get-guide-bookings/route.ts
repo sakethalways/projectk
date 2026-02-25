@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
       
       const { data: profiles, error: profileError } = await serviceSupabase
         .from('tourist_profiles')
-        .select('id, user_id, name, phone_number, location, profile_picture_url')
+        .select('id, user_id, name, phone_number, location, profile_picture_url, email')
         .in('user_id', touristIds);
       
       console.log('Tourist profiles fetched for IDs:', profiles);

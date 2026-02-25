@@ -88,7 +88,7 @@ export default function GuideConfirmedBookings() {
       });
 
       if (response.ok) {
-        setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: 'completed' } : b));
+        setBookings(bookings.filter(b => b.id !== bookingId));
       } else {
         setError('Failed to update booking');
       }
@@ -150,17 +150,6 @@ export default function GuideConfirmedBookings() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-foreground">
-          Confirmed Bookings
-          {bookings.length > 0 && (
-            <Badge className="ml-3 bg-green-100 text-green-800">{bookings.length} upcoming</Badge>
-          )}
-        </h2>
-        <p className="text-muted-foreground mt-1">Manage your upcoming confirmed tours</p>
-      </div>
-
       {/* Error */}
       {error && (
         <Alert className="bg-red-50 border-red-200">

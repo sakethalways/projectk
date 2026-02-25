@@ -1,16 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { extractBearerToken, validateUUID, isRateLimited } from '@/lib/security-utils';
+import { errorResponses, handleAPIError } from '@/lib/api-error-handler';
 
 export async function DELETE(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    if (isRateLimited(`unsave_guide_${ip}`, 50)) {
+      return errorResponses.rateLimited();
+    }
+
     const { searchParams } = new URL(request.url);
     const guide_id = searchParams.get('guide_id');
 
-    if (!guide_id) {
-      return NextResponse.json(
-        { error: 'guide_id is required' },
-        { status: 400 }
-      );
+    // Validate guide_id is UUID format
+    if (!guide_id || !validateUUID(guide_id)) {
+      return errorResponses.validation('Invalid guide ID format');
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -33,29 +39,20 @@ export async function DELETE(request: NextRequest) {
     // Get the auth header to get tourist_id
     const authHeader = request.headers.get('Authorization');
     if (!authHeader) {
-      return NextResponse.json(
-        { error: 'Authorization header required' },
-        { status: 401 }
-      );
+      return errorResponses.missingAuthHeader();
     }
 
     // Extract token from "Bearer <token>"
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Invalid authorization header' },
-        { status: 401 }
-      );
+    const { valid, token } = extractBearerToken(authHeader);
+    if (!valid || !token) {
+      return errorResponses.invalidToken();
     }
 
     // Verify the token and get user
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
     if (userError || !user) {
-      return NextResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 401 }
-      );
+      return errorResponses.invalidToken();
     }
 
     // Unsave the guide
@@ -66,22 +63,15 @@ export async function DELETE(request: NextRequest) {
       .eq('guide_id', guide_id);
 
     if (error) {
-      console.error('Error unsaving guide:', error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return handleAPIError(error, { action: 'unsave_guide', userId: user.id });
     }
 
     return NextResponse.json({
+      success: true,
       message: 'Guide unsaved successfully',
     });
   } catch (error) {
-    console.error('Error in unsave-guide API:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return handleAPIError(error, { action: 'unsave_guide' });
   }
 }
 

@@ -17,8 +17,6 @@ export default function TouristAvailableGuides() {
         setLoading(true);
         setError(null);
 
-        console.log('Fetching approved guides from API...');
-
         // Use API endpoint to bypass RLS restrictions
         const response = await fetch('/api/get-approved-guides');
 
@@ -27,7 +25,6 @@ export default function TouristAvailableGuides() {
         }
 
         const data = await response.json();
-        console.log('Guides fetched:', { count: data.count, guides: data.guides });
 
         if (data.error) {
           setError(data.error);
