@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { LogOut, Menu, X, LayoutDashboard, Home, Shield } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Home, Shield, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AdminSidebarProps {
@@ -20,6 +20,11 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
       href: '/admin/dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
+    },
+    {
+      href: '/admin/my-ratings',
+      label: 'Ratings & Reviews',
+      icon: Star,
     },
   ];
 

@@ -15,6 +15,7 @@ import {
   Calendar,
   History,
   Bookmark,
+  Star,
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -60,6 +61,11 @@ export function TouristSidebar() {
       label: 'Past Bookings',
       href: '/tourist/past-bookings',
       icon: History,
+    },
+    {
+      label: 'My Ratings & Reviews',
+      href: '/tourist/my-ratings',
+      icon: Star,
     },
   ];
 

@@ -8,10 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { TouristSidebar } from '@/components/tourist-sidebar';
-import { Loader2, AlertCircle, CheckCircle2, Upload } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Upload, Trash2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { LocationAutocomplete } from '@/components/location-autocomplete';
+import DeleteAccountModal from '@/components/delete-account-modal';
 
 interface TouristProfile {
   id: string;
@@ -35,6 +36,7 @@ export default function TouristDashboardPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -489,9 +491,40 @@ export default function TouristDashboardPage() {
                 </form>
               </Card>
             )}
+
+            {/* Danger Zone - Delete Account */}
+            <Card className="border border-red-200 bg-red-50 dark:bg-red-950 p-6 mt-8">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">
+                  Danger Zone
+                </h2>
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                  Irreversible actions
+                </p>
+              </div>
+
+              <Alert className="mb-4 border-red-300 bg-red-100 dark:bg-red-900">
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <AlertDescription className="text-red-800 dark:text-red-200">
+                  Deleting your account will permanently remove all your data including bookings,
+                  ratings, reviews, and saved guides. This action cannot be undone.
+                </AlertDescription>
+              </Alert>
+
+              <Button
+                onClick={() => setDeleteModalOpen(true)}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete My Account
+              </Button>
+            </Card>
           </div>
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} />
     </div>
   );
 }

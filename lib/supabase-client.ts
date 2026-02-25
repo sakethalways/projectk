@@ -85,3 +85,14 @@ export type SavedGuide = {
   guide_id: string;
   created_at: string;
 };
+
+export type RatingReview = {
+  id: string;
+  booking_id: string;
+  tourist_id: string;
+  guide_id: string;
+  rating: number; // 1-5 stars
+  review_text: string | null;
+  created_at: string;
+  updated_at: string;
+};

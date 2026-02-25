@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { LogOut, Menu, X, LayoutDashboard, User, Edit, Home } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, User, Edit, Home, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface GuideSidebarProps {
@@ -31,6 +31,11 @@ export default function GuideSidebar({ onLogout, guideName }: GuideSidebarProps)
       href: '/guide/edit-profile',
       label: 'Edit Profile',
       icon: Edit,
+    },
+    {
+      href: '/guide/my-ratings',
+      label: 'My Ratings',
+      icon: Star,
     },
   ];
 

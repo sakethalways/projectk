@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       .from('bookings')
       .select(`
         *,
-        guide:guides(id, name, location, phone_number, profile_picture_url),
+        guide:guides!bookings_guide_id_fkey(id, name, location, phone_number, profile_picture_url),
         itinerary:guide_itineraries(id, number_of_days, description, places_to_visit, instructions, image_1_url, image_2_url)
       `)
       .eq('tourist_id', user.id)

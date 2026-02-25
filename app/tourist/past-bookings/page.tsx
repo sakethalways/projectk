@@ -9,9 +9,10 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { Booking } from '@/lib/supabase-client';
-import { Loader2, AlertCircle, CheckCircle, XCircle, Clock, Trash2, RotateCw } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle, XCircle, Clock, Trash2, RotateCw, Star } from 'lucide-react';
 import { TouristSidebar } from '@/components/tourist-sidebar';
 import RebookGuideModal from '@/components/rebook-guide-modal';
+import RatingReviewModal from '@/components/rating-review-modal';
 
 interface BookingWithDetails extends Booking {
   guide?: { id: string; name: string; location: string; phone_number?: string; profile_picture_url?: string };
@@ -34,6 +35,7 @@ export default function PastBookingsPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [viewingItinerary, setViewingItinerary] = useState<BookingWithDetails | null>(null);
   const [rebookingBooking, setRebookingBooking] = useState<BookingWithDetails | null>(null);
+  const [ratingBooking, setRatingBooking] = useState<BookingWithDetails | null>(null);
 
   useEffect(() => {
     const checkAuthAndLoad = async () => {
@@ -227,6 +229,16 @@ export default function PastBookingsPage() {
                     >
                       View Itinerary
                     </Button>
+                    {booking.status === 'completed' && (
+                      <Button
+                        onClick={() => setRatingBooking(booking)}
+                        size="sm"
+                        className="flex-1 min-w-[120px] bg-yellow-600 hover:bg-yellow-700"
+                      >
+                        <Star className="w-4 h-4 mr-2" />
+                        Rate Guide
+                      </Button>
+                    )}
                     <Button
                       onClick={() => setRebookingBooking(booking)}
                       size="sm"
@@ -400,6 +412,24 @@ export default function PastBookingsPage() {
             setTimeout(() => {
               window.location.reload();
             }, 500);
+          }}
+        />
+      )}
+
+      {/* Rating Review Modal */}
+      {ratingBooking && (
+        <RatingReviewModal
+          open={!!ratingBooking}
+          onOpenChange={(open) => {
+            if (!open) {
+              setRatingBooking(null);
+            }
+          }}
+          bookingId={ratingBooking.id}
+          guideId={ratingBooking.guide_id}
+          guideName={ratingBooking.guide?.name || 'Guide'}
+          onRatingSubmitted={() => {
+            setRatingBooking(null);
           }}
         />
       )}

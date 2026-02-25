@@ -66,6 +66,19 @@ CREATE TABLE IF NOT EXISTS saved_guides (
   UNIQUE(tourist_id, guide_id)
 );
 
+-- Create ratings_reviews table
+CREATE TABLE IF NOT EXISTS ratings_reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+  tourist_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  guide_id UUID NOT NULL REFERENCES guides(id) ON DELETE CASCADE,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  review_text TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  UNIQUE(booking_id)
+);
+
 -- Create indexes
 CREATE INDEX IF NOT EXISTS idx_guides_user_id ON guides(user_id);
 CREATE INDEX IF NOT EXISTS idx_guides_status ON guides(status);
@@ -78,6 +91,10 @@ CREATE INDEX IF NOT EXISTS idx_guide_itineraries_guide_id ON guide_itineraries(g
 CREATE INDEX IF NOT EXISTS idx_saved_guides_tourist_id ON saved_guides(tourist_id);
 CREATE INDEX IF NOT EXISTS idx_saved_guides_guide_id ON saved_guides(guide_id);
 CREATE INDEX IF NOT EXISTS idx_saved_guides_tourist_guide ON saved_guides(tourist_id, guide_id);
+CREATE INDEX IF NOT EXISTS idx_ratings_reviews_booking_id ON ratings_reviews(booking_id);
+CREATE INDEX IF NOT EXISTS idx_ratings_reviews_tourist_id ON ratings_reviews(tourist_id);
+CREATE INDEX IF NOT EXISTS idx_ratings_reviews_guide_id ON ratings_reviews(guide_id);
+CREATE INDEX IF NOT EXISTS idx_ratings_reviews_tourist_guide ON ratings_reviews(tourist_id, guide_id);
 
 -- Enable RLS on tables
 ALTER TABLE guides ENABLE ROW LEVEL SECURITY;
@@ -85,6 +102,7 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE guide_availability ENABLE ROW LEVEL SECURITY;
 ALTER TABLE guide_itineraries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE saved_guides ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ratings_reviews ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for guides table
 CREATE POLICY "guides_read_authenticated"
@@ -178,6 +196,30 @@ CREATE POLICY "saved_guides_delete_own"
   ON saved_guides
   FOR DELETE
   USING (auth.uid() = tourist_id);
+
+-- RLS Policies for ratings_reviews table
+CREATE POLICY "ratings_reviews_read_all"
+  ON ratings_reviews
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "ratings_reviews_insert_tourist"
+  ON ratings_reviews
+  FOR INSERT
+  WITH CHECK (auth.uid() = tourist_id);
+
+CREATE POLICY "ratings_reviews_update_tourist"
+  ON ratings_reviews
+  FOR UPDATE
+  USING (auth.uid() = tourist_id);
+
+CREATE POLICY "ratings_reviews_delete_tourist_or_admin"
+  ON ratings_reviews
+  FOR DELETE
+  USING (
+    auth.uid() = tourist_id OR 
+    (SELECT role FROM users WHERE id = auth.uid()) = 'admin'
+  );
 
 -- Function to automatically create user record when auth user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()
