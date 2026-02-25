@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS guides (
   is_deactivated BOOLEAN DEFAULT false,
   deactivation_reason TEXT,
   is_resubmitted BOOLEAN DEFAULT false,
+  trips_completed INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
@@ -56,6 +57,15 @@ CREATE TABLE IF NOT EXISTS guide_itineraries (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
+-- Create saved_guides table
+CREATE TABLE IF NOT EXISTS saved_guides (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tourist_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  guide_id UUID NOT NULL REFERENCES guides(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  UNIQUE(tourist_id, guide_id)
+);
+
 -- Create indexes
 CREATE INDEX IF NOT EXISTS idx_guides_user_id ON guides(user_id);
 CREATE INDEX IF NOT EXISTS idx_guides_status ON guides(status);
@@ -65,12 +75,16 @@ CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 CREATE INDEX IF NOT EXISTS idx_guide_availability_guide_id ON guide_availability(guide_id);
 CREATE INDEX IF NOT EXISTS idx_guide_availability_user_id ON guide_availability(user_id);
 CREATE INDEX IF NOT EXISTS idx_guide_itineraries_guide_id ON guide_itineraries(guide_id);
+CREATE INDEX IF NOT EXISTS idx_saved_guides_tourist_id ON saved_guides(tourist_id);
+CREATE INDEX IF NOT EXISTS idx_saved_guides_guide_id ON saved_guides(guide_id);
+CREATE INDEX IF NOT EXISTS idx_saved_guides_tourist_guide ON saved_guides(tourist_id, guide_id);
 
 -- Enable RLS on tables
 ALTER TABLE guides ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE guide_availability ENABLE ROW LEVEL SECURITY;
 ALTER TABLE guide_itineraries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE saved_guides ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for guides table
 CREATE POLICY "guides_read_authenticated"
@@ -148,6 +162,22 @@ CREATE POLICY "guide_itineraries_delete_own"
   ON guide_itineraries
   FOR DELETE
   USING (auth.uid() = user_id);
+
+-- RLS Policies for saved_guides table
+CREATE POLICY "saved_guides_read_own"
+  ON saved_guides
+  FOR SELECT
+  USING (auth.uid() = tourist_id);
+
+CREATE POLICY "saved_guides_insert_own"
+  ON saved_guides
+  FOR INSERT
+  WITH CHECK (auth.uid() = tourist_id);
+
+CREATE POLICY "saved_guides_delete_own"
+  ON saved_guides
+  FOR DELETE
+  USING (auth.uid() = tourist_id);
 
 -- Function to automatically create user record when auth user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()

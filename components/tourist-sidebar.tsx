@@ -14,6 +14,7 @@ import {
   Compass,
   Calendar,
   History,
+  Bookmark,
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -44,6 +45,11 @@ export function TouristSidebar() {
       label: 'Explore Guides',
       href: '/tourist/explore-guides',
       icon: Compass,
+    },
+    {
+      label: 'Saved Guides',
+      href: '/tourist/saved-guides',
+      icon: Bookmark,
     },
     {
       label: 'Booking Status',

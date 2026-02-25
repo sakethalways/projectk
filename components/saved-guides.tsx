@@ -1,0 +1,116 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import type { Guide } from '@/lib/supabase-client';
+import TouristGuideCard from './tourist-guide-card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase-client';
+
+export default function SavedGuidesComponent() {
+  const [guides, setGuides] = useState<Guide[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSavedGuides = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Get auth token
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        setError('Please log in to view saved guides');
+        setGuides([]);
+        return;
+      }
+
+      // Fetch saved guides from API
+      const response = await fetch('/api/get-saved-guides', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        setError(data.error);
+        setGuides([]);
+        return;
+      }
+
+      setGuides(data.guides || []);
+    } catch (err) {
+      console.error('Error fetching saved guides:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch saved guides');
+      setGuides([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSavedGuides();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Show error if there's an actual error message
+  if (error && guides.length === 0) {
+    return (
+      <Alert className="bg-slate-100 border-slate-300">
+        <AlertCircle className="h-4 w-4 text-slate-600" />
+        <AlertDescription className="text-slate-700">{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  // If no guides found, show placeholder
+  if (guides.length === 0) {
+    return (
+      <div className="text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
+        <p className="text-slate-600 dark:text-slate-300 text-lg">No saved guides yet</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
+          Start exploring and save your favorite guides!
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground">
+          {guides.length} guide{guides.length !== 1 ? 's' : ''} saved
+        </p>
+      </div>
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {guides.map((guide) => (
+          <TouristGuideCard 
+            key={guide.id} 
+            guide={guide} 
+            onUnsave={() => {
+              // Refresh the list after unsaving
+              fetchSavedGuides();
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}

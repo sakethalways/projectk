@@ -197,6 +197,14 @@ export default function GuideDetailModal({
                   )}
                 </div>
               </div>
+
+              {/* Trips Completed */}
+              <div>
+                <Label className="text-xs text-muted-foreground">Trips Completed</Label>
+                <p className="text-foreground font-medium text-lg">
+                  <span className="text-green-600 dark:text-green-400 font-bold">{guide.trips_completed ?? 0}</span> trips
+                </p>
+              </div>
             </div>
           </TabsContent>
 

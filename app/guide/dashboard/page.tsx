@@ -50,7 +50,22 @@ export default function GuideDashboard() {
           return;
         }
 
-        setGuide(guideData);
+        // Sync trips_completed count (calculate from completed bookings)
+        try {
+          await fetch(`/api/sync-trips-completed?guide_id=${guideData.id}`);
+        } catch (err) {
+          console.error('Error syncing trips_completed:', err);
+          // Continue anyway, not critical
+        }
+
+        // Fetch fresh guide data after sync
+        const { data: freshGuideData } = await supabase
+          .from('guides')
+          .select('*')
+          .eq('user_id', authData.user.id)
+          .single();
+
+        setGuide(freshGuideData || guideData);
       } catch (err) {
         console.error('Error:', err);
         setError('An error occurred');
@@ -100,6 +115,16 @@ export default function GuideDashboard() {
           <p className="text-sm sm:text-base text-muted-foreground">
             Manage your profile, availability, and itineraries all in one place.
           </p>
+          {/* Trip Count Message */}
+          <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
+            <p className="text-sm sm:text-base font-medium text-foreground">
+              {(guide.trips_completed ?? 0) === 0 ? (
+                <span className="text-muted-foreground">No trips completed yet</span>
+              ) : (
+                <span>✨ Number of trips you have done: <strong className="text-green-600 dark:text-green-400">{guide.trips_completed}</strong></span>
+              )}
+            </p>
+          </div>
         </Card>
 
         {/* Quick Stats */}

@@ -63,6 +63,20 @@ export default function AdminDashboard() {
           return;
         }
 
+        // Sync all guides' trips_completed counts
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          await fetch('/api/sync-trips-completed', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session?.access_token || ''}`,
+            },
+          });
+        } catch (err) {
+          console.error('Error syncing trips_completed:', err);
+          // Continue anyway, not critical
+        }
+
         // Load all guides
         const { data: guidesData, error: guidesError } = await supabase
           .from('guides')

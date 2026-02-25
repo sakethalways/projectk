@@ -5,21 +5,27 @@ import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, BookOpen, Calendar, Loader2 } from 'lucide-react';
+import { MapPin, BookOpen, Calendar, Loader2, Bookmark } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
 import type { Guide, GuideAvailability } from '@/lib/supabase-client';
 import ItineraryModal from './itinerary-modal';
 import BookGuideModal from './book-guide-modal';
+import { useToast } from '@/hooks/use-toast';
 
 interface TouristGuideCardProps {
   guide: Guide;
+  onUnsave?: () => void;
 }
 
-export default function TouristGuideCard({ guide }: TouristGuideCardProps) {
+export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardProps) {
+  const { toast } = useToast();
   const [showItinerary, setShowItinerary] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [availability, setAvailability] = useState<GuideAvailability | null>(null);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [loadingSave, setLoadingSave] = useState(false);
+  const [checkingSaveStatus, setCheckingSaveStatus] = useState(true);
 
   // Fetch availability when component mounts
   useEffect(() => {
@@ -49,6 +55,103 @@ export default function TouristGuideCard({ guide }: TouristGuideCardProps) {
     fetchAvailability();
   }, [guide.id]);
 
+  // Check if guide is saved
+  useEffect(() => {
+    const checkSaveStatus = async () => {
+      try {
+        setCheckingSaveStatus(true);
+        const { data: savedGuideRecords, error } = await supabase
+          .from('saved_guides')
+          .select('id')
+          .eq('guide_id', guide.id)
+          .limit(1);
+
+        if (!error && savedGuideRecords && savedGuideRecords.length > 0) {
+          setIsSaved(true);
+        } else {
+          setIsSaved(false);
+        }
+      } catch (err) {
+        console.error('Error checking save status:', err);
+      } finally {
+        setCheckingSaveStatus(false);
+      }
+    };
+
+    checkSaveStatus();
+  }, [guide.id]);
+
+  // Handle save/unsave
+  const handleToggleSave = async () => {
+    try {
+      setLoadingSave(true);
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        toast({
+          title: 'Error',
+          description: 'Please log in to save guides',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (isSaved) {
+        // Unsave the guide
+        const response = await fetch(`/api/unsave-guide?guide_id=${guide.id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to unsave guide');
+        }
+
+        setIsSaved(false);
+        toast({
+          title: 'Removed',
+          description: 'Guide removed from saved guides',
+        });
+        onUnsave?.();
+      } else {
+        // Save the guide
+        const response = await fetch('/api/save-guide', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ guide_id: guide.id }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to save guide');
+        }
+
+        setIsSaved(true);
+        toast({
+          title: 'Saved',
+          description: 'Guide added to saved guides',
+        });
+      }
+    } catch (err) {
+      console.error('Error toggling save:', err);
+      toast({
+        title: 'Error',
+        description: err instanceof Error ? err.message : 'Failed to save guide',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingSave(false);
+    }
+  };
+
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -75,6 +178,24 @@ export default function TouristGuideCard({ guide }: TouristGuideCardProps) {
               <p className="text-sm">No Photo</p>
             </div>
           )}
+          
+          {/* Save Button */}
+          <Button
+            onClick={handleToggleSave}
+            disabled={loadingSave || checkingSaveStatus}
+            className="absolute top-2 right-2 p-2 h-auto"
+            variant={isSaved ? 'default' : 'outline'}
+            size="sm"
+            title={isSaved ? 'Remove from saved guides' : 'Save guide'}
+          >
+            {loadingSave || checkingSaveStatus ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : isSaved ? (
+              <Bookmark className="w-4 h-4 fill-current" />
+            ) : (
+              <Bookmark className="w-4 h-4" />
+            )}
+          </Button>
         </div>
 
         {/* Content */}

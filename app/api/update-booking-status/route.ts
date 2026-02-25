@@ -53,6 +53,29 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // If marking as completed or past, increment guide's trips_completed count
+    if ((status === 'completed' || status === 'past') && data?.guide_id) {
+      // Get current trips_completed count
+      const { data: guideData } = await supabase
+        .from('guides')
+        .select('trips_completed')
+        .eq('id', data.guide_id)
+        .single();
+
+      const currentCount = guideData?.trips_completed ?? 0;
+
+      // Update with incremented count
+      const { error: updateGuideError } = await supabase
+        .from('guides')
+        .update({ trips_completed: currentCount + 1 })
+        .eq('id', data.guide_id);
+
+      if (updateGuideError) {
+        console.error('Error updating guide trips_completed:', updateGuideError);
+        // Don't fail the booking update, just log the error
+      }
+    }
+
     return NextResponse.json({
       booking: data,
       message: `Booking ${status} successfully`,

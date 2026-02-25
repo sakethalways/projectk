@@ -33,6 +33,7 @@ export type Guide = {
   is_deactivated: boolean; // For approved guides - deactivated by admin
   deactivation_reason: string | null; // Reason for deactivation
   is_resubmitted: boolean; // Flag to show if guide resubmitted after rejection
+  trips_completed: number; // Count of completed trips
   created_at: string;
   updated_at: string;
 };
@@ -76,4 +77,11 @@ export type Booking = {
   price_type: 'per_day' | 'per_trip';
   created_at: string;
   updated_at: string;
+};
+
+export type SavedGuide = {
+  id: string;
+  tourist_id: string;
+  guide_id: string;
+  created_at: string;
 };
