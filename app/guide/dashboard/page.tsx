@@ -9,6 +9,9 @@ import { supabase } from '@/lib/supabase-client';
 import { Eye, Edit } from 'lucide-react';
 import GuideAvailabilityManager from '@/components/guide-availability-manager';
 import GuideItineraryManager from '@/components/guide-itinerary-manager';
+import GuideBookingRequests from '@/components/guide-booking-requests';
+import GuideConfirmedBookings from '@/components/guide-confirmed-bookings';
+import GuidePastBookings from '@/components/guide-past-bookings';
 import GuideSidebar from '@/components/guide-sidebar';
 import type { Guide } from '@/lib/supabase-client';
 
@@ -172,6 +175,24 @@ export default function GuideDashboard() {
           {/* Itinerary Manager */}
           <div>
             <GuideItineraryManager guideId={guide.id} userId={guide.user_id} />
+          </div>
+        </div>
+
+        {/* Bookings Section */}
+        <div className="mt-10 sm:mt-12 space-y-8">
+          {/* Booking Requests */}
+          <div>
+            <GuideBookingRequests />
+          </div>
+
+          {/* Confirmed Bookings */}
+          <div>
+            <GuideConfirmedBookings />
+          </div>
+
+          {/* Past Bookings */}
+          <div>
+            <GuidePastBookings />
           </div>
         </div>
       </main>

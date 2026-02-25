@@ -64,3 +64,16 @@ export type GuideItinerary = {
   created_at: string;
   updated_at: string;
 };
+
+export type Booking = {
+  id: string;
+  tourist_id: string;
+  guide_id: string;
+  itinerary_id: string;
+  booking_date: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'cancelled' | 'completed' | 'past';
+  price: number;
+  price_type: 'per_day' | 'per_trip';
+  created_at: string;
+  updated_at: string;
+};

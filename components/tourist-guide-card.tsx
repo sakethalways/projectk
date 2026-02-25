@@ -9,6 +9,7 @@ import { MapPin, BookOpen, Calendar, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
 import type { Guide, GuideAvailability } from '@/lib/supabase-client';
 import ItineraryModal from './itinerary-modal';
+import BookGuideModal from './book-guide-modal';
 
 interface TouristGuideCardProps {
   guide: Guide;
@@ -16,6 +17,7 @@ interface TouristGuideCardProps {
 
 export default function TouristGuideCard({ guide }: TouristGuideCardProps) {
   const [showItinerary, setShowItinerary] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
   const [availability, setAvailability] = useState<GuideAvailability | null>(null);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
 
@@ -149,16 +151,26 @@ export default function TouristGuideCard({ guide }: TouristGuideCardProps) {
             </div>
           )}
 
-          {/* View Itinerary Button */}
-          <Button
-            onClick={() => setShowItinerary(true)}
-            variant="default"
-            size="sm"
-            className="w-full mt-auto"
-          >
-            <BookOpen className="w-4 h-4 mr-2" />
-            View Itinerary
-          </Button>
+          {/* View Itinerary & Book Buttons */}
+          <div className="flex gap-2 mt-auto">
+            <Button
+              onClick={() => setShowItinerary(true)}
+              variant="default"
+              size="sm"
+              className="flex-1 gap-2"
+            >
+              <BookOpen className="w-4 h-4" />
+              View
+            </Button>
+            <Button
+              onClick={() => setShowBooking(true)}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            >
+              Book Now
+            </Button>
+          </div>
         </div>
       </Card>
 
@@ -168,6 +180,13 @@ export default function TouristGuideCard({ guide }: TouristGuideCardProps) {
         guideName={guide.name}
         open={showItinerary}
         onOpenChange={setShowItinerary}
+      />
+
+      {/* Book Guide Modal */}
+      <BookGuideModal
+        guide={guide}
+        open={showBooking}
+        onOpenChange={setShowBooking}
       />
     </>
   );

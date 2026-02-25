@@ -12,6 +12,7 @@ import type { Guide } from '@/lib/supabase-client';
 import GuideDetailModal from '@/components/guide-detail-modal';
 import AdminActionsModal from '@/components/admin-actions-modal';
 import AdminSidebar from '@/components/admin-sidebar';
+import AdminBookingDashboard from '@/components/admin-booking-dashboard';
 import { Loader2 } from 'lucide-react';
 
 interface Tourist {
@@ -242,7 +243,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="pending" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="pending" className="text-xs sm:text-sm">
               Pending <Badge variant="outline" className="ml-1 sm:ml-2 text-xs">{pendingGuides.length}</Badge>
             </TabsTrigger>
@@ -254,6 +255,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="tourists" className="text-xs sm:text-sm">
               Tourists <Badge variant="outline" className="ml-1 sm:ml-2 text-xs">{tourists.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="bookings" className="text-xs sm:text-sm">
+              Bookings
             </TabsTrigger>
           </TabsList>
 
@@ -603,6 +607,11 @@ export default function AdminDashboard() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          {/* Bookings Tab */}
+          <TabsContent value="bookings" className="mt-6">
+            <AdminBookingDashboard />
           </TabsContent>
         </Tabs>
       </main>
