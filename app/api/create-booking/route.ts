@@ -30,6 +30,29 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Check for active bookings with the same guide
+    const { data: existingBookings, error: checkError } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('tourist_id', tourist_id)
+      .eq('guide_id', guide_id)
+      .in('status', ['pending', 'accepted']);
+
+    if (checkError) {
+      console.error('Error checking existing bookings:', checkError);
+      return NextResponse.json(
+        { error: 'Failed to verify booking availability' },
+        { status: 500 }
+      );
+    }
+
+    if (existingBookings && existingBookings.length > 0) {
+      return NextResponse.json(
+        { error: 'You already have an active booking with this guide. Complete or cancel your previous booking first.' },
+        { status: 400 }
+      );
+    }
+
     // Create booking
     const { data, error } = await supabase
       .from('bookings')

@@ -39,6 +39,7 @@ export default function BookGuideModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [booking, setBooking] = useState(false);
+  const [hasActiveBooking, setHasActiveBooking] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -49,6 +50,7 @@ export default function BookGuideModal({
       setSelectedDate('');
       setSelectedItinerary(null);
       setError(null);
+      setHasActiveBooking(false);
       return;
     }
 
@@ -59,11 +61,27 @@ export default function BookGuideModal({
     try {
       setLoading(true);
       setError(null);
+      setHasActiveBooking(false);
 
       // Get current user
       const { data: authData } = await supabase.auth.getUser();
       if (authData.user) {
         setTourist(authData.user);
+
+        // Check if user has active bookings with this guide
+        const { data: bookings, error: bookingsError } = await supabase
+          .from('bookings')
+          .select('*')
+          .eq('tourist_id', authData.user.id)
+          .eq('guide_id', guide.id)
+          .in('status', ['pending', 'accepted']);
+
+        if (!bookingsError && bookings && bookings.length > 0) {
+          setHasActiveBooking(true);
+          setError('You already have an active booking with this guide. See your booking status for details.');
+          setStep('availability-check');
+          return;
+        }
       }
 
       // Check guide availability
@@ -183,7 +201,8 @@ export default function BookGuideModal({
         <DialogHeader>
           <DialogTitle>Book {guide.name}</DialogTitle>
           <DialogDescription>
-            {step === 'availability-check' && 'Checking availability...'}
+            {step === 'availability-check' && hasActiveBooking && 'You already have an active booking'}
+            {step === 'availability-check' && !hasActiveBooking && 'Checking availability...'}
             {step === 'date-selection' && 'Select a date'}
             {step === 'itinerary-selection' && 'Choose an itinerary'}
             {step === 'confirmation' && 'Confirm your booking'}
@@ -327,6 +346,16 @@ export default function BookGuideModal({
             )}
 
             {step === 'date-selection' && error && (
+              <Button
+                onClick={() => onOpenChange(false)}
+                variant="outline"
+                className="w-full"
+              >
+                Close
+              </Button>
+            )}
+
+            {step === 'availability-check' && hasActiveBooking && (
               <Button
                 onClick={() => onOpenChange(false)}
                 variant="outline"

@@ -5,14 +5,15 @@ import { supabase } from '@/lib/supabase-client';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import type { Booking } from '@/lib/supabase-client';
 import { Loader2, AlertCircle, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface BookingWithDetails extends Booking {
-  tourist?: { id: string; user_id: string; name: string; phone_number: string; location: string; email: string };
-  guide?: { id: string; name: string; location: string; phone_number?: string };
+  tourist?: { id: string; user_id: string; name: string; phone_number: string; location: string; email: string; profile_picture_url?: string };
+  guide?: { id: string; name: string; location: string; phone_number?: string; profile_picture_url?: string };
   itinerary?: {
     id: string;
     number_of_days: number;
@@ -171,19 +172,39 @@ export default function AdminBookingDashboard() {
 
                       <div className="space-y-3 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Tourist</p>
-                          <p className="font-medium text-foreground">{booking.tourist?.name || 'N/A'}</p>
+                          <div className="flex items-center gap-2 mb-2">
+                            {booking.tourist?.profile_picture_url && (
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={booking.tourist.profile_picture_url} alt={booking.tourist.name} />
+                                <AvatarFallback>{booking.tourist.name.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                            )}
+                            <div>
+                              <p className="text-muted-foreground">Tourist</p>
+                              <p className="font-medium text-foreground">{booking.tourist?.name || 'N/A'}</p>
+                            </div>
+                          </div>
                           {booking.tourist && (
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-xs text-muted-foreground ml-10">
                               {booking.tourist.phone_number} • {booking.tourist.location}
                             </p>
                           )}
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Guide</p>
-                          <p className="font-medium text-foreground">{booking.guide?.name}</p>
+                          <div className="flex items-center gap-2 mb-2">
+                            {booking.guide?.profile_picture_url && (
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={booking.guide.profile_picture_url} alt={booking.guide.name} />
+                                <AvatarFallback>{booking.guide.name.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                            )}
+                            <div>
+                              <p className="text-muted-foreground">Guide</p>
+                              <p className="font-medium text-foreground">{booking.guide?.name}</p>
+                            </div>
+                          </div>
                           {booking.guide && (
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-xs text-muted-foreground ml-10">
                               {booking.guide.phone_number || 'N/A'} • {booking.guide.location}
                             </p>
                           )}
@@ -215,7 +236,6 @@ export default function AdminBookingDashboard() {
                   {booking.itinerary && (
                     <div className="mt-4 pt-4 border-t border-border">
                       <p className="text-xs text-muted-foreground">Itinerary</p>
-                      <p className="text-sm text-foreground line-clamp-2 mb-3">{booking.itinerary.description}</p>
                       <Button
                         onClick={() => setViewingItinerary(booking)}
                         variant="outline"

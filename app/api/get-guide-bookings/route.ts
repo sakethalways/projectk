@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
       .from('bookings')
       .select(`
         *,
-        guide:guides(id, name, location),
-        itinerary:guide_itineraries(id, number_of_days, description)
+        guide:guides(id, name, location, profile_picture_url),
+        itinerary:guide_itineraries(id, number_of_days, description, places_to_visit, instructions, image_1_url, image_2_url)
       `)
       .eq('guide_id', guideData.id)
       .eq('status', 'pending')
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
       
       const { data: profiles, error: profileError } = await serviceSupabase
         .from('tourist_profiles')
-        .select('id, user_id, name, phone_number, location, email')
+        .select('id, user_id, name, phone_number, location, email, profile_picture_url')
         .in('user_id', touristIds);
       
       console.log('Tourist profiles fetched for IDs:', profiles);

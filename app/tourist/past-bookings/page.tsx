@@ -9,8 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { Booking } from '@/lib/supabase-client';
-import { Loader2, AlertCircle, CheckCircle, XCircle, Clock, Trash2 } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle, XCircle, Clock, Trash2, RotateCw } from 'lucide-react';
 import { TouristSidebar } from '@/components/tourist-sidebar';
+import RebookGuideModal from '@/components/rebook-guide-modal';
 
 interface BookingWithDetails extends Booking {
   guide?: { id: string; name: string; location: string; phone_number?: string; profile_picture_url?: string };
@@ -25,13 +26,14 @@ interface BookingWithDetails extends Booking {
   };
 }
 
-export default function TouristBookingStatus() {
+export default function PastBookingsPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
   const [viewingItinerary, setViewingItinerary] = useState<BookingWithDetails | null>(null);
+  const [rebookingBooking, setRebookingBooking] = useState<BookingWithDetails | null>(null);
 
   useEffect(() => {
     const checkAuthAndLoad = async () => {
@@ -77,7 +79,11 @@ export default function TouristBookingStatus() {
 
       if (response.ok) {
         const data = await response.json();
-        setBookings(data.bookings || []);
+        // Only show past bookings
+        const pastBookings = (data.bookings || []).filter((b: BookingWithDetails) =>
+          ['cancelled', 'completed', 'past'].includes(b.status)
+        );
+        setBookings(pastBookings);
       } else {
         setError('Failed to load bookings');
       }
@@ -87,48 +93,28 @@ export default function TouristBookingStatus() {
     }
   };
 
-  const handleCancelBooking = async (bookingId: string) => {
-    if (!confirm('Are you sure you want to cancel this booking?')) return;
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (!confirm('Delete this booking?')) return;
 
     try {
       setDeleting(bookingId);
-      const { data: { session } } = await supabase.auth.getSession();
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', bookingId);
 
-      if (!session?.access_token) {
-        setError('Not authenticated');
-        setDeleting(null);
-        return;
-      }
-
-      const response = await fetch('/api/update-booking-status', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ booking_id: bookingId, status: 'cancelled' }),
-      });
-
-      if (response.ok) {
-        setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: 'cancelled' } : b));
+      if (!error) {
+        setBookings(bookings.filter(b => b.id !== bookingId));
       }
     } catch (err) {
-      console.error('Error cancelling booking:', err);
+      console.error('Error deleting booking:', err);
     } finally {
       setDeleting(null);
     }
   };
 
-
-
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 mr-1" /> Pending</Badge>;
-      case 'accepted':
-        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" /> Confirmed</Badge>;
-      case 'rejected':
-        return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" /> Rejected</Badge>;
       case 'cancelled':
         return <Badge variant="outline">Cancelled</Badge>;
       case 'completed':
@@ -161,8 +147,8 @@ export default function TouristBookingStatus() {
       <main className="flex-1 w-full lg:w-0 px-4 sm:px-6 py-6 sm:py-10 max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Booking Status</h1>
-          <p className="text-muted-foreground">View and manage your tour bookings</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Past Bookings</h1>
+          <p className="text-muted-foreground">View and manage your completed and past tour bookings</p>
         </div>
 
         {/* Error */}
@@ -176,129 +162,99 @@ export default function TouristBookingStatus() {
         {/* No Bookings */}
         {bookings.length === 0 ? (
           <Card className="border border-border p-12 text-center">
-            <p className="text-muted-foreground mb-4">No bookings yet</p>
-            <Button onClick={() => router.push('/tourist/explore-guides')}>
-              Explore Guides
+            <p className="text-muted-foreground mb-4">No past bookings yet</p>
+            <Button onClick={() => router.push('/tourist/booking-status')}>
+              View All Bookings
             </Button>
           </Card>
         ) : (
-          <div>
-            {/* Active Bookings */}
-            {bookings.filter(b => ['pending', 'accepted', 'rejected'].includes(b.status)).length > 0 ? (
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-4">Active Bookings</h2>
-                <div className="grid gap-4">
-                  {bookings
-                    .filter(b => ['pending', 'accepted', 'rejected'].includes(b.status))
-                    .map((booking) => (
-                      <Card key={booking.id} className="border border-border p-6">
-                        <div className="flex flex-col gap-4">
-                          {/* Info */}
-                          <div>
-                            <div className="flex items-center gap-3 mb-3">
-                              {booking.guide?.profile_picture_url && (
-                                <Avatar className="h-10 w-10">
-                                  <AvatarImage src={booking.guide.profile_picture_url} alt={booking.guide.name} />
-                                  <AvatarFallback>{booking.guide.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                              )}
-                              <div>
-                                <h3 className="text-lg font-semibold text-foreground">
-                                  {booking.guide?.name}
-                                </h3>
-                                <p className="text-xs text-muted-foreground">{booking.guide?.location}</p>
-                              </div>
-                              {getStatusBadge(booking.status)}
-                            </div>
+          <div className="grid gap-4">
+            {bookings.map((booking) => (
+              <Card key={booking.id} className="border border-border p-6">
+                <div className="flex flex-col gap-4">
+                  {/* Info */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-3">
+                      {booking.guide?.profile_picture_url && (
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={booking.guide.profile_picture_url} alt={booking.guide.name} />
+                          <AvatarFallback>{booking.guide.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                      )}
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground">
+                          {booking.guide?.name}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">{booking.guide?.location}</p>
+                      </div>
+                      {getStatusBadge(booking.status)}
+                    </div>
 
-                            <div className="grid grid-cols-2 gap-3 text-sm mb-3">
-                              <div>
-                                <p className="text-muted-foreground">Location</p>
-                                <p className="font-semibold text-foreground">{booking.guide?.location}</p>
-                              </div>
-                              <div>
-                                <p className="text-muted-foreground">Phone</p>
-                                <p className="font-semibold text-foreground">{booking.guide?.phone_number || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-muted-foreground">Date</p>
-                                <p className="font-semibold text-foreground">{formatDate(booking.booking_date)}</p>
-                              </div>
-                              <div>
-                                <p className="text-muted-foreground">Duration</p>
-                                <p className="font-semibold text-foreground">{booking.itinerary?.number_of_days} days</p>
-                              </div>
-                              <div className="col-span-2">
-                                <p className="text-muted-foreground">Price</p>
-                                <p className="font-semibold text-foreground text-lg">
-                                  ₹{booking.price} {booking.price_type === 'per_day' ? '/ day' : '/ trip'}
-                                </p>
-                              </div>
-                            </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                      <div>
+                        <p className="text-muted-foreground">Location</p>
+                        <p className="font-semibold text-foreground">{booking.guide?.location}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Phone</p>
+                        <p className="font-semibold text-foreground">{booking.guide?.phone_number || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Date</p>
+                        <p className="font-semibold text-foreground">{formatDate(booking.booking_date)}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Duration</p>
+                        <p className="font-semibold text-foreground">{booking.itinerary?.number_of_days} days</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-muted-foreground">Price</p>
+                        <p className="font-semibold text-foreground text-lg">
+                          ₹{booking.price} {booking.price_type === 'per_day' ? '/ day' : '/ trip'}
+                        </p>
+                      </div>
+                    </div>
 
-                          </div>
+                  </div>
 
-                          {/* Actions */}
-                          <div className="flex gap-2 flex-wrap">
-                            <Button
-                              onClick={() => setViewingItinerary(booking)}
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 min-w-[120px]"
-                            >
-                              View Itinerary
-                            </Button>
-                            {booking.status === 'pending' && (
-                              <Button
-                                onClick={() => handleCancelBooking(booking.id)}
-                                variant="outline"
-                                size="sm"
-                                disabled={deleting === booking.id}
-                                className="flex-1 min-w-[100px] text-destructive hover:bg-destructive/10"
-                              >
-                                {deleting === booking.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <>  
-                                    <Trash2 className="w-4 h-4 mr-1" />
-                                    Cancel
-                                  </>
-                                )}
-                              </Button>
-                            )}
-
-                            {booking.status === 'accepted' && (
-                              <Button
-                                onClick={() => handleCancelBooking(booking.id)}
-                                variant="outline"
-                                size="sm"
-                                disabled={deleting === booking.id}
-                                className="flex-1 min-w-[100px]"
-                              >
-                                {deleting === booking.id ? (
-                                  <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  'Cancel'
-                                )}
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                </div>
-              </div>
-            ) : (
-              <Card className="border border-border p-12 text-center">
-                <p className="text-muted-foreground mb-4">No active bookings</p>
-                <div className="space-y-2">
-                  <Button onClick={() => router.push('/tourist/explore-guides')}>
-                    Book a Guide
-                  </Button>
-                  <p className="text-sm text-muted-foreground mt-4">View your past bookings in the <strong>Past Bookings</strong> section</p>
+                  {/* Actions */}
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      onClick={() => setViewingItinerary(booking)}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 min-w-[120px]"
+                    >
+                      View Itinerary
+                    </Button>
+                    <Button
+                      onClick={() => setRebookingBooking(booking)}
+                      size="sm"
+                      className="flex-1 min-w-[120px]"
+                    >
+                      <RotateCw className="w-4 h-4 mr-2" />
+                      Book Again
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteBooking(booking.id)}
+                      variant="outline"
+                      size="sm"
+                      disabled={deleting === booking.id}
+                      className="flex-1 min-w-[100px] text-destructive hover:bg-destructive/10"
+                    >
+                      {deleting === booking.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </Card>
-            )}
+            ))}
           </div>
         )}
       </main>
@@ -426,6 +382,27 @@ export default function TouristBookingStatus() {
         </div>
       )}
 
+      {/* Rebook Guide Modal */}
+      {rebookingBooking && (
+        <RebookGuideModal
+          previousBooking={rebookingBooking}
+          open={!!rebookingBooking}
+          onOpenChange={(open) => {
+            if (!open) {
+              setRebookingBooking(null);
+            }
+          }}
+          onBookingSuccess={() => {
+            // Close modal and refresh page
+            setRebookingBooking(null);
+            // Trigger a page reload to show the new booking
+            setLoading(true);
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          }}
+        />
+      )}
     </div>
   );
 }

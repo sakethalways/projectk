@@ -13,6 +13,7 @@ import {
   MapPin,
   Compass,
   Calendar,
+  History,
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
@@ -48,6 +49,11 @@ export function TouristSidebar() {
       label: 'Booking Status',
       href: '/tourist/booking-status',
       icon: Calendar,
+    },
+    {
+      label: 'Past Bookings',
+      href: '/tourist/past-bookings',
+      icon: History,
     },
   ];
 
