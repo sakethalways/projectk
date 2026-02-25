@@ -70,6 +70,10 @@ export default function RebookGuideModal({
   }, [open, previousBooking.guide?.id, previousBooking.itinerary?.id]);
 
   const validateAndLoad = async () => {
+    if (!supabase) {
+      setError('Service unavailable');
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
@@ -84,7 +88,7 @@ export default function RebookGuideModal({
       };
 
       // Get current user
-      const { data: authData } = await supabase.auth.getUser();
+      const { data: authData } = await supabase!.auth.getUser();
       if (authData.user) {
         setTourist(authData.user);
       }
@@ -100,7 +104,7 @@ export default function RebookGuideModal({
       }
 
       // TEST CASE 1: Check if guide still exists
-      const { data: guideData, error: guideError } = await supabase
+      const { data: guideData, error: guideError } = await supabase!
         .from('guides')
         .select('*')
         .eq('id', guideId)
@@ -118,7 +122,7 @@ export default function RebookGuideModal({
       validationResult.guideMessage = `✓ Guide "${guideData.name}" still active`;
 
       // TEST CASE 2: Check guide's current availability status
-      const { data: availData, error: availError } = await supabase
+      const { data: availData, error: availError } = await supabase!
         .from('guide_availability')
         .select('*')
         .eq('guide_id', guideId)
@@ -148,7 +152,7 @@ export default function RebookGuideModal({
       setAvailability(availData);
 
       // TEST CASE 4: Check if the same itinerary still exists
-      const { data: itineraryData, error: itineraryError } = await supabase
+      const { data: itineraryData, error: itineraryError } = await supabase!
         .from('guide_itineraries')
         .select('*')
         .eq('id', itineraryId)

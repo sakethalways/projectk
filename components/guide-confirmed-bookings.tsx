@@ -33,6 +33,11 @@ export default function GuideConfirmedBookings() {
 
   useEffect(() => {
     const loadBookings = async () => {
+      if (!supabase) {
+        setError('Service unavailable');
+        setLoading(false);
+        return;
+      }
       try {
         const { data: { session } } = await supabase.auth.getSession();
 
@@ -68,6 +73,10 @@ export default function GuideConfirmedBookings() {
   const handleCompleteTrip = async (bookingId: string) => {
     if (!confirm('Mark this trip as completed?')) return;
 
+    if (!supabase) {
+      setError('Service unavailable');
+      return;
+    }
     try {
       setUpdating(bookingId);
       const { data: { session } } = await supabase.auth.getSession();
@@ -103,6 +112,10 @@ export default function GuideConfirmedBookings() {
   const handleCancelBooking = async (bookingId: string) => {
     if (!confirm('Cancel this booking? The tourist will be notified.')) return;
 
+    if (!supabase) {
+      setError('Service unavailable');
+      return;
+    }
     try {
       setUpdating(bookingId);
       const { data: { session } } = await supabase.auth.getSession();

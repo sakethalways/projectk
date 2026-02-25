@@ -38,7 +38,12 @@ export default function GuideAccountPage() {
   useEffect(() => {
     const loadGuide = async () => {
       try {
-        const { data: authData } = await supabase.auth.getUser();
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
+        const { data: authData } = await supabase!.auth.getUser();
 
         if (!authData.user) {
           router.push('/guide/login');
@@ -110,6 +115,10 @@ export default function GuideAccountPage() {
 
   const handleSaveProfile = async () => {
     try {
+      if (!supabase) {
+        setError('Supabase not initialized');
+        return;
+      }
       setSaving(true);
       setError('');
       setSuccess('');
@@ -126,7 +135,7 @@ export default function GuideAccountPage() {
         const fileExt = profilePicture.name.split('.').pop();
         const fileName = `${guide.user_id}/profile.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase!.storage
           .from('guide-profiles')
           .upload(fileName, profilePicture, { upsert: true });
 
@@ -136,14 +145,14 @@ export default function GuideAccountPage() {
           return;
         }
 
-        const { data: urlData } = supabase.storage
+        const { data: urlData } = supabase!.storage
           .from('guide-profiles')
           .getPublicUrl(fileName);
 
         picUrl = urlData.publicUrl;
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabase!
         .from('guides')
         .update({
           name: formData.name,
@@ -190,7 +199,8 @@ export default function GuideAccountPage() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    if (!supabase) return;
+    await supabase!.auth.signOut();
     router.push('/');
   };
 

@@ -50,7 +50,11 @@ export async function deleteGuideUserCompletely(guideId: string, userId: string)
  */
 export async function deactivateGuide(guideId: string, reason: string) {
   try {
-    const { error } = await supabase
+    if (!supabase) {
+      console.error('Supabase not initialized');
+      return { success: false, error: 'Supabase not initialized' };
+    }
+    const { error } = await supabase!
       .from('guides')
       .update({
         is_deactivated: true,
@@ -77,7 +81,11 @@ export async function deactivateGuide(guideId: string, reason: string) {
  */
 export async function activateGuide(guideId: string) {
   try {
-    const { error } = await supabase
+    if (!supabase) {
+      console.error('Supabase not initialized');
+      return { success: false, error: 'Supabase not initialized' };
+    }
+    const { error } = await supabase!
       .from('guides')
       .update({
         is_deactivated: false,

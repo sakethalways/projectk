@@ -56,10 +56,15 @@ export default function TouristDashboardPage() {
   useEffect(() => {
     const fetchUserAndProfile = async () => {
       try {
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
         const {
           data: { user: authUser },
           error: authError,
-        } = await supabase.auth.getUser();
+        } = await supabase!.auth.getUser();
 
         if (authError || !authUser) {
           router.push('/tourist/login');
@@ -69,7 +74,7 @@ export default function TouristDashboardPage() {
         setUser(authUser);
 
         // Fetch tourist profile
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await supabase!
           .from('tourist_profiles')
           .select('*')
           .eq('user_id', authUser.id)
@@ -140,6 +145,11 @@ export default function TouristDashboardPage() {
   };
 
   const handleSaveProfile = async () => {
+    if (!supabase) {
+      setError('Supabase not initialized');
+      setSaving(false);
+      return;
+    }
     setError('');
     setSuccess('');
     setSaving(true);
@@ -177,7 +187,7 @@ export default function TouristDashboardPage() {
         if (profile.profile_picture_url) {
           const oldFileName = profile.profile_picture_url.split('/').pop();
           if (oldFileName) {
-            await supabase.storage
+            await supabase!.storage
               .from('tourist-profiles')
               .remove([`${profile.user_id}/${oldFileName}`]);
           }
@@ -187,7 +197,7 @@ export default function TouristDashboardPage() {
         const fileExt = files.profile_picture.name.split('.').pop();
         const fileName = `${profile.user_id}/profile.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase!.storage
           .from('tourist-profiles')
           .upload(fileName, files.profile_picture, {
             upsert: true,
@@ -200,7 +210,7 @@ export default function TouristDashboardPage() {
         }
 
         // Get public URL
-        const { data: publicUrl } = supabase.storage
+        const { data: publicUrl } = supabase!.storage
           .from('tourist-profiles')
           .getPublicUrl(fileName);
 
@@ -208,7 +218,7 @@ export default function TouristDashboardPage() {
       }
 
       // Update profile
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabase!
         .from('tourist_profiles')
         .update({
           name: formData.name,

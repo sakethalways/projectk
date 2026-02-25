@@ -145,8 +145,13 @@ function TouristSignupContent() {
     setLoading(true);
 
     try {
+      if (!supabase) {
+        setError('Service unavailable');
+        setLoading(false);
+        return;
+      }
       // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await supabase!.auth.signUp({
         email: formData.email,
         password: formData.password,
       });
@@ -160,7 +165,7 @@ function TouristSignupContent() {
       const userId = authData.user.id;
 
       // Upsert user role
-      const { error: userError } = await supabase.from('users').upsert(
+      const { error: userError } = await supabase!.from('users').upsert(
         {
           id: userId,
           email: formData.email,
@@ -180,7 +185,7 @@ function TouristSignupContent() {
       const fileExt = files.profile_picture!.name.split('.').pop();
       const fileName = `${userId}/profile.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase!.storage
         .from('tourist-profiles')
         .upload(fileName, files.profile_picture!);
 
@@ -192,12 +197,12 @@ function TouristSignupContent() {
       }
 
       // Get public URL
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = supabase!.storage
         .from('tourist-profiles')
         .getPublicUrl(fileName);
 
       // Create tourist profile
-      const { error: profileError } = await supabase.from('tourist_profiles').insert({
+      const { error: profileError } = await supabase!.from('tourist_profiles').insert({
         user_id: userId,
         name: formData.name,
         email: formData.email,
@@ -242,7 +247,12 @@ function TouristSignupContent() {
         return;
       }
 
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      if (!supabase) {
+        setError('Service unavailable');
+        setLoading(false);
+        return;
+      }
+      const { data: authData, error: authError } = await supabase!.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password,
       });
@@ -253,27 +263,27 @@ function TouristSignupContent() {
         return;
       }
 
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error: userError } = await supabase!
         .from('users')
         .select('role')
         .eq('id', authData.user.id)
         .single();
 
       if (userError || userData?.role !== 'tourist') {
-        await supabase.auth.signOut();
+        await supabase!.auth.signOut();
         setError('You do not have tourist access. Please contact support.');
         setLoading(false);
         return;
       }
 
-      const { data: touristData, error: touristError } = await supabase
+      const { data: touristData, error: touristError } = await supabase!
         .from('tourist_profiles')
         .select('id')
         .eq('user_id', authData.user.id)
         .single();
 
       if (touristError || !touristData) {
-        await supabase.auth.signOut();
+        await supabase!.auth.signOut();
         setError('Tourist profile not found. Please contact support.');
         setLoading(false);
         return;

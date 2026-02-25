@@ -17,6 +17,11 @@ export default function AvailabilityPage() {
   useEffect(() => {
     const checkAuthAndLoadGuide = async () => {
       try {
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
         const { data: authData, error: authError } = await supabase.auth.getUser();
 
         if (authError || !authData.user) {
@@ -54,6 +59,7 @@ export default function AvailabilityPage() {
   }, [router]);
 
   const handleLogout = async () => {
+    if (!supabase) return;
     await supabase.auth.signOut();
     router.push('/');
   };

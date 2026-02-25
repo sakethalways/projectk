@@ -20,8 +20,13 @@ export default function GuideProfile() {
   useEffect(() => {
     const checkAuthAndLoadGuide = async () => {
       try {
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
         // Get current user
-        const { data: authData, error: authError } = await supabase.auth.getUser();
+        const { data: authData, error: authError } = await supabase!.auth.getUser();
 
         if (authError || !authData.user) {
           router.push('/guide/login');
@@ -59,7 +64,8 @@ export default function GuideProfile() {
   }, [router]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    if (!supabase) return;
+    await supabase!.auth.signOut();
     localStorage.removeItem('guide_id');
     router.push('/');
   };

@@ -13,6 +13,11 @@ export default function SavedGuidesComponent() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchSavedGuides = async () => {
+    if (!supabase) {
+      setError('Service unavailable');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);

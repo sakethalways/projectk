@@ -67,6 +67,15 @@ export default function RatingReviewModal({
       return;
     }
 
+    if (!supabase) {
+      toast({
+        title: 'Error',
+        description: 'Service unavailable',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       const {
@@ -127,6 +136,14 @@ export default function RatingReviewModal({
   const handleDelete = async () => {
     if (!existingRating) return;
 
+    if (!supabase) {
+      toast({
+        title: 'Error',
+        description: 'Service unavailable',
+        variant: 'destructive',
+      });
+      return;
+    }
     try {
       setLoading(true);
       const {

@@ -20,6 +20,11 @@ export default function GuideDashboard() {
   useEffect(() => {
     const checkAuthAndLoadGuide = async () => {
       try {
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
         // Get current user
         const { data: authData, error: authError } = await supabase.auth.getUser();
 
@@ -74,6 +79,7 @@ export default function GuideDashboard() {
   }, [router]);
 
   const handleLogout = async () => {
+    if (!supabase) return;
     await supabase.auth.signOut();
     localStorage.removeItem('guide_id');
     router.push('/');
@@ -158,7 +164,7 @@ export default function GuideDashboard() {
           {/* Language */}
           <Card className="border border-border p-4 sm:p-5 lg:p-6">
             <div className="text-center">
-              <p className="text-lg sm:text-2xl font-bold text-foreground mb-1 sm:mb-2">{guide.language}</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mb-1 sm:mb-2">{Array.isArray(guide.languages) && guide.languages.length > 0 ? guide.languages[0] : 'Not specified'}</p>
               <p className="text-xs sm:text-sm text-muted-foreground">Primary Language</p>
             </div>
           </Card>

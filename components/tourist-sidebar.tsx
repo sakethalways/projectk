@@ -28,6 +28,7 @@ export function TouristSidebar() {
   const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
+    if (!supabase) return;
     try {
       await supabase.auth.signOut();
       router.push('/');

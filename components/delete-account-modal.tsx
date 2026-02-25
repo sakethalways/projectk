@@ -40,8 +40,13 @@ export default function DeleteAccountModal({ open, onOpenChange }: DeleteAccount
     setError(null);
 
     try {
+      if (!supabase) {
+        setError('Database connection failed. Please try again.');
+        setLoading(false);
+        return;
+      }
       // Get session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase!.auth.getSession();
 
       if (sessionError || !session) {
         setError('Authentication failed. Please log in again.');
@@ -75,7 +80,9 @@ export default function DeleteAccountModal({ open, onOpenChange }: DeleteAccount
       });
 
       // Clear session
-      await supabase.auth.signOut();
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
 
       // Clear local storage
       localStorage.clear();

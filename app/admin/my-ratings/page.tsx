@@ -16,6 +16,10 @@ export default function AdminRatingsPage() {
   // Check authentication
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) {
+        router.push('/admin/login');
+        return;
+      }
       try {
         const {
           data: { user: authUser },
@@ -40,8 +44,9 @@ export default function AdminRatingsPage() {
   }, [router]);
 
   const handleLogout = async () => {
+    if (!supabase) return;
     try {
-      await supabase.auth.signOut();
+      await supabase!.auth.signOut();
       router.push('/admin/login');
     } catch (err) {
       console.error('Logout error:', err);

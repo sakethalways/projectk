@@ -58,6 +58,10 @@ export default function BookGuideModal({
   }, [open, guide.id]);
 
   const checkAvailabilityAndLoadData = async () => {
+    if (!supabase) {
+      setError('Service unavailable');
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
@@ -69,7 +73,7 @@ export default function BookGuideModal({
         setTourist(authData.user);
 
         // Check if user has active bookings with this guide
-        const { data: bookings, error: bookingsError } = await supabase
+        const { data: bookings, error: bookingsError } = await supabase!
           .from('bookings')
           .select('*')
           .eq('tourist_id', authData.user.id)
@@ -85,7 +89,7 @@ export default function BookGuideModal({
       }
 
       // Check guide availability
-      const { data: availData, error: availError } = await supabase
+      const { data: availData, error: availError } = await supabase!
         .from('guide_availability')
         .select('*')
         .eq('guide_id', guide.id)
@@ -110,7 +114,7 @@ export default function BookGuideModal({
       }
 
       // Fetch itineraries
-      const { data: itineraryData, error: itinError } = await supabase
+      const { data: itineraryData, error: itinError } = await supabase!
         .from('guide_itineraries')
         .select('*')
         .eq('guide_id', guide.id)

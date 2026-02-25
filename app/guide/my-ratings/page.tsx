@@ -16,6 +16,10 @@ export default function GuideRatingsPage() {
   // Check authentication and fetch guide data
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) {
+        router.push('/guide/login');
+        return;
+      }
       try {
         const {
           data: { user: authUser },
@@ -28,7 +32,7 @@ export default function GuideRatingsPage() {
         }
 
         // Fetch guide data
-        const { data: guideData, error: guideError } = await supabase
+        const { data: guideData, error: guideError } = await supabase!
           .from('guides')
           .select('id, name')
           .eq('user_id', authUser.id)
@@ -52,6 +56,7 @@ export default function GuideRatingsPage() {
   }, [router]);
 
   const handleLogout = async () => {
+    if (!supabase) return;
     try {
       await supabase.auth.signOut();
       router.push('/guide/login');

@@ -39,8 +39,13 @@ export default function EditProfilePage() {
   useEffect(() => {
     const checkAuthAndLoadGuide = async () => {
       try {
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
         // Get current user
-        const { data: authData, error: authError } = await supabase.auth.getUser();
+        const { data: authData, error: authError } = await supabase!.auth.getUser();
 
         if (authError || !authData.user) {
           router.push('/guide/login');
@@ -112,13 +117,16 @@ export default function EditProfilePage() {
 
   const uploadFile = async (file: File, bucket: string, path: string) => {
     try {
-      const { data, error } = await supabase.storage
+      if (!supabase) {
+        throw new Error('Supabase not initialized');
+      }
+      const { data, error } = await supabase!.storage
         .from(bucket)
         .upload(path, file, { upsert: true });
 
       if (error) throw error;
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = supabase!.storage
         .from(bucket)
         .getPublicUrl(path);
 
@@ -131,7 +139,8 @@ export default function EditProfilePage() {
 
   const deleteFile = async (bucket: string, path: string) => {
     try {
-      const { error } = await supabase.storage
+      if (!supabase) return;
+      const { error } = await supabase!.storage
         .from(bucket)
         .remove([path]);
 
@@ -163,6 +172,10 @@ export default function EditProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setError('Supabase not initialized');
+      return;
+    }
     setError('');
     setSuccess('');
     setSaving(true);
@@ -202,7 +215,7 @@ export default function EditProfilePage() {
       }
 
       // Update guide record
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabase!
         .from('guides')
         .update({
           name: formData.name,
@@ -247,7 +260,8 @@ export default function EditProfilePage() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    if (!supabase) return;
+    await supabase!.auth.signOut();
     localStorage.removeItem('guide_id');
     router.push('/');
   };

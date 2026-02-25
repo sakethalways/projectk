@@ -28,8 +28,13 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
   useEffect(() => {
     const fetchAvailability = async () => {
       try {
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
         // Use .limit(1) instead of .single() to avoid 406 error when no data exists
-        const { data, error: fetchError } = await supabase
+        const { data, error: fetchError } = await supabase!
           .from('guide_availability')
           .select('*')
           .eq('guide_id', guideId)
@@ -53,13 +58,13 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
   }, [guideId]);
 
   const handleToggleStatus = async () => {
-    if (!availability) return;
+    if (!supabase || !availability) return;
     setSaving(true);
     setError('');
     setSuccess('');
 
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabase!
         .from('guide_availability')
         .update({ is_available: !isAvailable })
         .eq('id', availability.id);
@@ -79,6 +84,10 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
   };
 
   const handleSaveAvailability = async () => {
+    if (!supabase) {
+      setError('Supabase not initialized');
+      return;
+    }
     if (!startDate || !endDate) {
       setError('Please select both start and end dates');
       return;
@@ -96,7 +105,7 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
     try {
       if (availability) {
         // Update existing
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabase!
           .from('guide_availability')
           .update({
             start_date: startDate,
@@ -117,7 +126,7 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
         setSuccess('Availability updated successfully');
       } else {
         // Create new
-        const { data, error: insertError } = await supabase
+        const { data, error: insertError } = await supabase!
           .from('guide_availability')
           .insert({
             guide_id: guideId,
@@ -146,13 +155,13 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
   };
 
   const handleDeleteAvailability = async () => {
-    if (!availability || !confirm('Are you sure? This will delete your availability record.')) return;
+    if (!supabase || !availability || !confirm('Are you sure? This will delete your availability record.')) return;
 
     setSaving(true);
     setError('');
 
     try {
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await supabase!
         .from('guide_availability')
         .delete()
         .eq('id', availability.id);

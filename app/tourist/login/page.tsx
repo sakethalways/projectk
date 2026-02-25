@@ -27,6 +27,11 @@ export default function TouristLoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setError('Supabase not initialized');
+      setLoading(false);
+      return;
+    }
     setError('');
     setLoading(true);
 
@@ -43,7 +48,7 @@ export default function TouristLoginPage() {
         return;
       }
 
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase!.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
@@ -54,7 +59,7 @@ export default function TouristLoginPage() {
         return;
       }
 
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error: userError } = await supabase!
         .from('users')
         .select('role')
         .eq('id', authData.user.id)
@@ -67,7 +72,7 @@ export default function TouristLoginPage() {
         return;
       }
 
-      const { data: touristData, error: touristError } = await supabase
+      const { data: touristData, error: touristError } = await supabase!
         .from('tourist_profiles')
         .select('id')
         .eq('user_id', authData.user.id)

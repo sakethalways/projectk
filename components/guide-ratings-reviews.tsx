@@ -14,6 +14,11 @@ export default function GuideRatingsReviews() {
   const [avgRating, setAvgRating] = useState(0);
 
   const fetchRatings = async () => {
+    if (!supabase) {
+      setError('Service unavailable');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);

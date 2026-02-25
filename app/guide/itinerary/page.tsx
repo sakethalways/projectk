@@ -17,7 +17,12 @@ export default function ItineraryPage() {
   useEffect(() => {
     const checkAuthAndLoadGuide = async () => {
       try {
-        const { data: authData, error: authError } = await supabase.auth.getUser();
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
+        const { data: authData, error: authError } = await supabase!.auth.getUser();
 
         if (authError || !authData.user) {
           router.push('/guide/login');
@@ -54,7 +59,8 @@ export default function ItineraryPage() {
   }, [router]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    if (!supabase) return;
+    await supabase!.auth.signOut();
     router.push('/');
   };
 

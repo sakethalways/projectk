@@ -50,6 +50,12 @@ function AdminDashboardContent() {
   
   useEffect(() => {
     const checkAuthAndLoadData = async () => {
+      if (!supabase) {
+        setError('Supabase is not configured');
+        setLoading(false);
+        return;
+      }
+
       try {
         // Get current user
         const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -130,7 +136,9 @@ function AdminDashboardContent() {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
       router.push('/');
     } catch (err) {
       console.error('Logout error:', err);
@@ -138,6 +146,7 @@ function AdminDashboardContent() {
   };
 
   const handleApprove = async (guide: Guide) => {
+    if (!supabase) return;
     setActionLoading(guide.id);
     try {
       const { error } = await supabase
@@ -157,6 +166,7 @@ function AdminDashboardContent() {
   };
 
   const handleReject = async (guide: Guide, reason: string) => {
+    if (!supabase) return;
     setActionLoading(guide.id);
     try {
       const { error } = await supabase
@@ -177,6 +187,7 @@ function AdminDashboardContent() {
 
   const handleAdminActionSuccess = async () => {
     setShowActionModal(false);
+    if (!supabase) return;
     // Reload guides
     const { data: guidesData } = await supabase
       .from('guides')
@@ -408,6 +419,17 @@ function AdminDashboardContent() {
                       <div className="flex gap-2 sm:flex-col sm:gap-2 justify-start flex-shrink-0 w-full sm:w-auto">
                         <Button
                           size="sm"
+                          className="gap-1 text-xs flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={() => {
+                            setSelectedGuide(guide);
+                            setShowModal(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4" />
+                          <span className="hidden sm:inline">View</span>
+                        </Button>
+                        <Button
+                          size="sm"
                           variant="outline"
                           className="gap-1 text-xs flex-1 sm:flex-none"
                           onClick={() => {
@@ -418,6 +440,19 @@ function AdminDashboardContent() {
                         >
                           <Ban className="w-4 h-4" />
                           <span className="hidden sm:inline">Deactivate</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="gap-1 text-xs flex-1 sm:flex-none"
+                          onClick={() => {
+                            setSelectedGuide(guide);
+                            setAdminAction('delete');
+                            setShowActionModal(true);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span className="hidden sm:inline">Delete</span>
                         </Button>
                       </div>
                     </div>

@@ -39,6 +39,11 @@ export default function PastBookingsPage() {
 
   useEffect(() => {
     const checkAuthAndLoad = async () => {
+      if (!supabase) {
+        setError('Service unavailable');
+        setLoading(false);
+        return;
+      }
       try {
         // Get current user
         const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -62,6 +67,7 @@ export default function PastBookingsPage() {
   }, [router]);
 
   const loadBookings = async (userId: string) => {
+    if (!supabase) return;
     try {
       // Get fresh session
       const { data: { session } } = await supabase.auth.getSession();
@@ -98,9 +104,10 @@ export default function PastBookingsPage() {
   const handleDeleteBooking = async (bookingId: string) => {
     if (!confirm('Delete this booking?')) return;
 
+    if (!supabase) return;
     try {
       setDeleting(bookingId);
-      const { error } = await supabase
+      const { error } = await supabase!
         .from('bookings')
         .delete()
         .eq('id', bookingId);

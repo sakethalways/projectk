@@ -47,7 +47,12 @@ export default function GuideItineraryManager({ guideId, userId }: GuideItinerar
   useEffect(() => {
     const fetchItineraries = async () => {
       try {
-        const { data, error: fetchError } = await supabase
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
+        const { data, error: fetchError } = await supabase!
           .from('guide_itineraries')
           .select('*')
           .eq('guide_id', guideId)
@@ -68,13 +73,16 @@ export default function GuideItineraryManager({ guideId, userId }: GuideItinerar
 
   const handleImageUpload = async (file: File, bucket: string, path: string): Promise<string | null> => {
     try {
-      const { data, error: uploadError } = await supabase.storage
+      if (!supabase) {
+        throw new Error('Supabase not initialized');
+      }
+      const { data, error: uploadError } = await supabase!.storage
         .from(bucket)
         .upload(path, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
+      const { data: urlData } = supabase!.storage.from(bucket).getPublicUrl(path);
       return urlData.publicUrl;
     } catch (err) {
       // Error uploading image
@@ -83,6 +91,10 @@ export default function GuideItineraryManager({ guideId, userId }: GuideItinerar
   };
 
   const handleSaveItinerary = async () => {
+    if (!supabase) {
+      setError('Supabase not initialized');
+      return;
+    }
     // Trim and parse the number value robustly
     const trimmedDays = String(formData.number_of_days).trim();
     const daysNum = parseInt(trimmedDays, 10);
@@ -145,7 +157,7 @@ export default function GuideItineraryManager({ guideId, userId }: GuideItinerar
 
       if (editingId) {
         // Update existing
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabase!
           .from('guide_itineraries')
           .update(itineraryData)
           .eq('id', editingId);
@@ -160,7 +172,7 @@ export default function GuideItineraryManager({ guideId, userId }: GuideItinerar
         setSuccess('Itinerary updated successfully');
       } else {
         // Create new
-        const { data, error: insertError } = await supabase
+        const { data, error: insertError } = await supabase!
           .from('guide_itineraries')
           .insert(itineraryData)
           .select()
@@ -183,13 +195,13 @@ export default function GuideItineraryManager({ guideId, userId }: GuideItinerar
   };
 
   const handleDeleteItinerary = async (id: string) => {
-    if (!confirm('Are you sure? This will delete the itinerary.')) return;
+    if (!supabase || !confirm('Are you sure? This will delete the itinerary.')) return;
 
     setSaving(true);
     setError('');
 
     try {
-      const { error: deleteError } = await supabase.from('guide_itineraries').delete().eq('id', id);
+      const { error: deleteError } = await supabase!.from('guide_itineraries').delete().eq('id', id);
 
       if (deleteError) throw deleteError;
 

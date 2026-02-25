@@ -30,6 +30,11 @@ export default function GuideBookingRequests() {
 
   useEffect(() => {
     const loadRequests = async () => {
+      if (!supabase) {
+        setError('Service unavailable');
+        setLoading(false);
+        return;
+      }
       try {
         const { data: { session } } = await supabase.auth.getSession();
 
@@ -65,6 +70,10 @@ export default function GuideBookingRequests() {
   }, []);
 
   const handleStatusUpdate = async (bookingId: string, status: 'accepted' | 'rejected') => {
+    if (!supabase) {
+      setError('Service unavailable');
+      return;
+    }
     try {
       setUpdating(bookingId);
       const { data: { session } } = await supabase.auth.getSession();

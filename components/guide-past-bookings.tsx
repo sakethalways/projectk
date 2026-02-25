@@ -31,6 +31,11 @@ export default function GuidePastBookings() {
 
   useEffect(() => {
     const loadBookings = async () => {
+      if (!supabase) {
+        setError('Service unavailable');
+        setLoading(false);
+        return;
+      }
       try {
         const { data: { session } } = await supabase.auth.getSession();
 

@@ -10,7 +10,8 @@ export default function BookingRequestsPage() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    if (!supabase) return;
+    await supabase!.auth.signOut();
     localStorage.removeItem('guide_id');
     router.push('/');
   };

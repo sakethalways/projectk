@@ -16,6 +16,11 @@ export default function AdminRatingsReviews() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchRatings = async () => {
+    if (!supabase) {
+      setError('Service unavailable');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
@@ -57,6 +62,14 @@ export default function AdminRatingsReviews() {
   }, []);
 
   const handleDelete = async (ratingId: string) => {
+    if (!supabase) {
+      toast({
+        title: 'Error',
+        description: 'Service unavailable',
+        variant: 'destructive',
+      });
+      return;
+    }
     try {
       const {
         data: { session },

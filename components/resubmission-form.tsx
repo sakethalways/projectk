@@ -56,8 +56,13 @@ export default function ResubmissionForm({ email, onCancel }: ResubmissionFormPr
   useEffect(() => {
     const loadGuideData = async () => {
       try {
+        if (!supabase) {
+          setError('Supabase not initialized');
+          setLoading(false);
+          return;
+        }
         // Get current user
-        const { data: authData, error: authError } = await supabase.auth.getUser();
+        const { data: authData, error: authError } = await supabase!.auth.getUser();
 
         if (authError || !authData.user) {
           setError('Not authenticated');
@@ -66,7 +71,7 @@ export default function ResubmissionForm({ email, onCancel }: ResubmissionFormPr
         }
 
         // Get guide data
-        const { data: guide, error: guideError } = await supabase
+        const { data: guide, error: guideError } = await supabase!
           .from('guides')
           .select('*')
           .eq('user_id', authData.user.id)
@@ -145,13 +150,16 @@ export default function ResubmissionForm({ email, onCancel }: ResubmissionFormPr
 
   const uploadFile = async (file: File, bucket: string, path: string) => {
     try {
-      const { error } = await supabase.storage
+      if (!supabase) {
+        throw new Error('Supabase not initialized');
+      }
+      const { error } = await supabase!.storage
         .from(bucket)
         .upload(path, file, { upsert: true });
 
       if (error) throw error;
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = supabase!.storage
         .from(bucket)
         .getPublicUrl(path);
 
@@ -164,6 +172,10 @@ export default function ResubmissionForm({ email, onCancel }: ResubmissionFormPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setError('Supabase not initialized');
+      return;
+    }
     setError('');
     setSubmitting(true);
 
@@ -197,7 +209,7 @@ export default function ResubmissionForm({ email, onCancel }: ResubmissionFormPr
       }
 
       // Update guide record with resubmission
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabase!
         .from('guides')
         .update({
           name: formData.name,

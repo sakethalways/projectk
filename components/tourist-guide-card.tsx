@@ -30,10 +30,11 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
   // Fetch availability when component mounts
   useEffect(() => {
     const fetchAvailability = async () => {
+      if (!supabase) return;
       try {
         setLoadingAvailability(true);
         // Use .limit(1) instead of .single() to avoid 406 error when no data exists
-        const { data, error } = await supabase
+        const { data, error } = await supabase!
           .from('guide_availability')
           .select('*')
           .eq('guide_id', guide.id)
@@ -56,9 +57,10 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
   // Check if guide is saved
   useEffect(() => {
     const checkSaveStatus = async () => {
+      if (!supabase) return;
       try {
         setCheckingSaveStatus(true);
-        const { data: savedGuideRecords, error } = await supabase
+        const { data: savedGuideRecords, error } = await supabase!
           .from('saved_guides')
           .select('id')
           .eq('guide_id', guide.id)
@@ -81,6 +83,7 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
 
   // Handle save/unsave
   const handleToggleSave = async () => {
+    if (!supabase) return;
     try {
       setLoadingSave(true);
       const {

@@ -35,6 +35,11 @@ export default function TouristBookingStatus() {
 
   useEffect(() => {
     const checkAuthAndLoad = async () => {
+      if (!supabase) {
+        setError('Service unavailable');
+        setLoading(false);
+        return;
+      }
       try {
         // Get current user
         const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -58,6 +63,7 @@ export default function TouristBookingStatus() {
   }, [router]);
 
   const loadBookings = async (userId: string) => {
+    if (!supabase) return;
     try {
       // Get fresh session
       const { data: { session } } = await supabase.auth.getSession();
@@ -91,6 +97,10 @@ export default function TouristBookingStatus() {
     if (!confirm('Are you sure you want to cancel this booking?')) return;
 
     try {
+      if (!supabase) {
+        setError('Service unavailable');
+        return;
+      }
       setDeleting(bookingId);
       const { data: { session } } = await supabase.auth.getSession();
 

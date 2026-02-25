@@ -16,6 +16,10 @@ export default function SavedGuidesPage() {
   // Check authentication
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) {
+        router.push('/tourist/login');
+        return;
+      }
       try {
         const {
           data: { user: authUser },

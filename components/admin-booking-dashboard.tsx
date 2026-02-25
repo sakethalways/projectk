@@ -37,6 +37,11 @@ export default function AdminBookingDashboard() {
   }, [filterStatus]);
 
   const loadBookings = async () => {
+    if (!supabase) {
+      setError('Service unavailable');
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
