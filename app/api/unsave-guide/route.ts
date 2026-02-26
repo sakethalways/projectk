@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { extractBearerToken, validateUUID, isRateLimited } from '@/lib/security-utils';
 import { errorResponses, handleAPIError } from '@/lib/api-error-handler';
+import { sendNotification } from '@/lib/send-notification';
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -55,6 +56,13 @@ export async function DELETE(request: NextRequest) {
       return errorResponses.invalidToken();
     }
 
+    // Get guide info for notification
+    const { data: guideData } = await supabase
+      .from('guides')
+      .select('user_id, name')
+      .eq('id', guide_id)
+      .single();
+
     // Unsave the guide
     const { error } = await supabase
       .from('saved_guides')
@@ -64,6 +72,17 @@ export async function DELETE(request: NextRequest) {
 
     if (error) {
       return handleAPIError(error, { action: 'unsave_guide', userId: user.id });
+    }
+
+    // Send notification to guide
+    if (guideData) {
+      await sendNotification(
+        guideData.user_id,
+        'guide_unsaved',
+        '⭐ Removed from Favorites',
+        `A tourist has removed your profile from their favorites.`,
+        { relatedGuideId: guide_id, relatedUserId: user.id }
+      );
     }
 
     return NextResponse.json({

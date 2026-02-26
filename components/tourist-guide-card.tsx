@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, BookOpen, Calendar, Loader2, Bookmark } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
+import { toast } from 'sonner';
 import type { Guide, GuideAvailability } from '@/lib/supabase-client';
 import ItineraryModal from './itinerary-modal';
 import BookGuideModal from './book-guide-modal';
-import { useToast } from '@/hooks/use-toast';
 
 interface TouristGuideCardProps {
   guide: Guide;
@@ -18,7 +18,6 @@ interface TouristGuideCardProps {
 }
 
 export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardProps) {
-  const { toast } = useToast();
   const [showItinerary, setShowItinerary] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
   const [availability, setAvailability] = useState<GuideAvailability | null>(null);
@@ -92,11 +91,7 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
       } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
-        toast({
-          title: 'Error',
-          description: 'Please log in to save guides',
-          variant: 'destructive',
-        });
+        toast.error('Please log in to save guides');
         return;
       }
 
@@ -114,10 +109,7 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
         }
 
         setIsSaved(false);
-        toast({
-          title: 'Removed',
-          description: 'Guide removed from saved guides',
-        });
+        toast.success('Guide removed from saved guides');
         onUnsave?.();
       } else {
         // Save the guide
@@ -136,18 +128,11 @@ export default function TouristGuideCard({ guide, onUnsave }: TouristGuideCardPr
         }
 
         setIsSaved(true);
-        toast({
-          title: 'Saved',
-          description: 'Guide added to saved guides',
-        });
+        toast.success('Guide added to saved guides');
       }
     } catch (err) {
       console.error('Error toggling save:', err);
-      toast({
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to save guide',
-        variant: 'destructive',
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to save guide');
     } finally {
       setLoadingSave(false);
     }

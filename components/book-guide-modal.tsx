@@ -70,7 +70,17 @@ export default function BookGuideModal({
       // Get current user
       const { data: authData } = await supabase.auth.getUser();
       if (authData.user) {
-        setTourist(authData.user);
+        // Fetch tourist profile with name
+        const { data: profile } = await supabase
+          .from('tourist_profiles')
+          .select('id, name, email')
+          .eq('user_id', authData.user.id)
+          .single();
+        
+        setTourist({
+          ...authData.user,
+          name: profile?.name || authData.user.email?.split('@')[0] || 'Tourist',
+        });
 
         // Check if user has active bookings with this guide
         const { data: bookings, error: bookingsError } = await supabase!
@@ -317,7 +327,7 @@ export default function BookGuideModal({
               <Alert className="bg-blue-50 border-blue-200">
                 <AlertCircle className="h-4 w-4 text-blue-600" />
                 <AlertDescription className="text-sm text-blue-800">
-                  Hey {tourist?.email?.split('@')[0]}, are you sure to confirm booking on {formatDate(selectedDate)} to {guide.location} with {guide.name} at ₹{selectedItinerary.price} {selectedItinerary.price_type === 'per_day' ? 'per day' : 'per trip'}?
+                  Hey {tourist?.name || 'there'}, are you sure to confirm booking on {formatDate(selectedDate)} to {guide.location} with {guide.name} at ₹{selectedItinerary.price} {selectedItinerary.price_type === 'per_day' ? 'per day' : 'per trip'}?
                 </AlertDescription>
               </Alert>
             </div>

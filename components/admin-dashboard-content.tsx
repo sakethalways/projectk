@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase-client';
+import { sendNotification } from '@/lib/send-notification';
 import { CheckCircle, XCircle, Clock, Eye, Trash2, Ban, RotateCcw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -156,6 +157,35 @@ function AdminDashboardContent() {
 
       if (error) throw error;
 
+      // Send notification to guide
+      await sendNotification(
+        guide.user_id,
+        'guide_approved',
+        '✅ Guide Application Approved',
+        'Congratulations! Your guide application has been approved. You can now start accepting bookings.',
+        { relatedGuideId: guide.id }
+      );
+
+      // Notify all admins about the approval
+      const { data: admins } = await supabase
+        .from('users')
+        .select('id')
+        .eq('role', 'admin');
+
+      if (admins && admins.length > 0) {
+        for (const admin of admins) {
+          if (admin.id !== (await supabase.auth.getUser()).data.user?.id) { // Don't notify self
+            await sendNotification(
+              admin.id,
+              'admin_action',
+              '✅ Guide Approved',
+              `Guide ${guide.name} has been approved.`,
+              { relatedGuideId: guide.id }
+            );
+          }
+        }
+      }
+
       setGuides(guides.map(g => g.id === guide.id ? { ...g, status: 'approved' } : g));
       setShowModal(false);
     } catch (err) {
@@ -175,6 +205,35 @@ function AdminDashboardContent() {
         .eq('id', guide.id);
 
       if (error) throw error;
+
+      // Send notification to guide
+      await sendNotification(
+        guide.user_id,
+        'guide_rejected',
+        '❌ Guide Application Rejected',
+        `Your guide application has been rejected. Reason: ${reason}. You can reapply after addressing the feedback.`,
+        { relatedGuideId: guide.id }
+      );
+
+      // Notify all admins about the rejection
+      const { data: admins } = await supabase
+        .from('users')
+        .select('id')
+        .eq('role', 'admin');
+
+      if (admins && admins.length > 0) {
+        for (const admin of admins) {
+          if (admin.id !== (await supabase.auth.getUser()).data.user?.id) { // Don't notify self
+            await sendNotification(
+              admin.id,
+              'admin_action',
+              '❌ Guide Rejected',
+              `Guide ${guide.name} has been rejected.`,
+              { relatedGuideId: guide.id }
+            );
+          }
+        }
+      }
 
       setGuides(guides.map(g => g.id === guide.id ? { ...g, status: 'rejected', rejection_reason: reason } : g));
       setShowModal(false);

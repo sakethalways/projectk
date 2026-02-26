@@ -20,6 +20,7 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { NotificationBell } from '@/components/notification-bell';
 
 export function TouristSidebar() {
   const router = useRouter();
@@ -75,8 +76,8 @@ export function TouristSidebar() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-gradient-to-b from-emerald-50 to-emerald-50 dark:from-emerald-950 dark:to-emerald-900 text-foreground">
       {/* Header */}
-      <div className="p-4 sm:p-6 border-b border-emerald-200 dark:border-emerald-800">
-        <div className="flex items-center gap-2">
+      <div className="p-4 sm:p-6 border-b border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 flex-1">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm sm:text-base">
             <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
@@ -84,6 +85,9 @@ export function TouristSidebar() {
             <p className="font-bold text-xs sm:text-sm truncate">Tourist</p>
             <p className="text-xs text-muted-foreground truncate">Portal</p>
           </div>
+        </div>
+        <div className="flex-shrink-0">
+          <NotificationBell />
         </div>
       </div>
 

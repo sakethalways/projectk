@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { deactivateGuide, activateGuide, deleteGuideUserCompletely } from '@/lib/user-management';
+import { sendNotification } from '@/lib/send-notification';
 import type { Guide } from '@/lib/supabase-client';
 
 interface AdminActionsModalProps {
@@ -57,6 +58,14 @@ export default function AdminActionsModal({
     const result = await deactivateGuide(guide.id, deactivationReason);
     
     if (result.success) {
+      // Send notification to guide
+      await sendNotification(
+        guide.user_id,
+        'guide_deactivated',
+        '⏸️ Account Deactivated',
+        `Your guide account has been deactivated. Reason: ${deactivationReason}. You can reactivate it anytime from your settings.`,
+        { relatedGuideId: guide.id }
+      );
       onSuccess();
       handleClose();
     } else {
@@ -75,6 +84,14 @@ export default function AdminActionsModal({
     const result = await activateGuide(guide.id);
 
     if (result.success) {
+      // Send notification to guide
+      await sendNotification(
+        guide.user_id,
+        'guide_reactivated',
+        '✅ Account Reactivated',
+        'Your guide account has been reactivated. You can now accept new bookings.',
+        { relatedGuideId: guide.id }
+      );
       onSuccess();
       handleClose();
     } else {
@@ -92,6 +109,15 @@ export default function AdminActionsModal({
 
     setLoading(true);
     setError('');
+
+    // Send notification before deletion (this might be the last message guide receives)
+    await sendNotification(
+      guide.user_id,
+      'guide_deleted',
+      '🗑️ Account Deleted',
+      'Your guide account and all associated data have been permanently deleted.',
+      { relatedGuideId: guide.id }
+    );
 
     const result = await deleteGuideUserCompletely(guide.id, guide.user_id);
 

@@ -7,10 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export default function AdminRatingsReviews() {
-  const { toast } = useToast();
   const [ratings, setRatings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,11 +62,7 @@ export default function AdminRatingsReviews() {
 
   const handleDelete = async (ratingId: string) => {
     if (!supabase) {
-      toast({
-        title: 'Error',
-        description: 'Service unavailable',
-        variant: 'destructive',
-      });
+      toast.error('Service unavailable');
       return;
     }
     try {
@@ -77,11 +72,7 @@ export default function AdminRatingsReviews() {
       } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
-        toast({
-          title: 'Error',
-          description: 'Please log in',
-          variant: 'destructive',
-        });
+        toast.error('Please log in');
         return;
       }
 
@@ -96,19 +87,12 @@ export default function AdminRatingsReviews() {
         throw new Error('Failed to delete rating');
       }
 
-      toast({
-        title: 'Deleted',
-        description: 'Rating has been removed',
-      });
+      toast.success('Rating has been removed');
 
       fetchRatings();
     } catch (err) {
       console.error('Error deleting rating:', err);
-      toast({
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to delete rating',
-        variant: 'destructive',
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to delete rating');
     }
   };
 
@@ -158,8 +142,9 @@ export default function AdminRatingsReviews() {
                   <div className="mb-3">
                     <p className="text-sm text-muted-foreground mb-1">Tourist</p>
                     <p className="font-semibold text-foreground">
-                      {rating.tourist?.email || 'Unknown Tourist'}
+                      {rating.tourist?.name || 'Unknown Tourist'}
                     </p>
+                    <p className="text-xs text-muted-foreground mt-1">{rating.tourist?.location || 'N/A'}</p>
                   </div>
 
                   <div>

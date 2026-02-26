@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Star, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface RatingReviewModalProps {
   open: boolean;
@@ -26,7 +26,6 @@ export default function RatingReviewModal({
   guideName,
   onRatingSubmitted,
 }: RatingReviewModalProps) {
-  const { toast } = useToast();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
@@ -59,20 +58,12 @@ export default function RatingReviewModal({
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      toast({
-        title: 'Error',
-        description: 'Please select a rating',
-        variant: 'destructive',
-      });
+      toast.error('Please select a rating');
       return;
     }
 
     if (!supabase) {
-      toast({
-        title: 'Error',
-        description: 'Service unavailable',
-        variant: 'destructive',
-      });
+      toast.error('Service unavailable');
       return;
     }
 
@@ -84,11 +75,7 @@ export default function RatingReviewModal({
       } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
-        toast({
-          title: 'Error',
-          description: 'Please log in to submit a rating',
-          variant: 'destructive',
-        });
+        toast.error('Please log in to submit a rating');
         return;
       }
 
@@ -110,10 +97,7 @@ export default function RatingReviewModal({
         throw new Error(errorData.error || 'Failed to submit rating');
       }
 
-      toast({
-        title: 'Success',
-        description: isEditing ? 'Rating updated successfully' : 'Rating submitted successfully',
-      });
+      toast.success(isEditing ? 'Rating updated successfully' : 'Rating submitted successfully');
 
       onOpenChange(false);
       onRatingSubmitted?.();
@@ -123,11 +107,7 @@ export default function RatingReviewModal({
       setExistingRating(null);
     } catch (err) {
       console.error('Error submitting rating:', err);
-      toast({
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to submit rating',
-        variant: 'destructive',
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to submit rating');
     } finally {
       setLoading(false);
     }
@@ -137,11 +117,7 @@ export default function RatingReviewModal({
     if (!existingRating) return;
 
     if (!supabase) {
-      toast({
-        title: 'Error',
-        description: 'Service unavailable',
-        variant: 'destructive',
-      });
+      toast.error('Service unavailable');
       return;
     }
     try {
@@ -152,11 +128,7 @@ export default function RatingReviewModal({
       } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
-        toast({
-          title: 'Error',
-          description: 'Please log in',
-          variant: 'destructive',
-        });
+        toast.error('Please log in');
         return;
       }
 
@@ -171,10 +143,7 @@ export default function RatingReviewModal({
         throw new Error('Failed to delete rating');
       }
 
-      toast({
-        title: 'Deleted',
-        description: 'Rating has been deleted',
-      });
+      toast.success('Rating has been deleted');
 
       onOpenChange(false);
       onRatingSubmitted?.();
@@ -184,11 +153,7 @@ export default function RatingReviewModal({
       setExistingRating(null);
     } catch (err) {
       console.error('Error deleting rating:', err);
-      toast({
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to delete rating',
-        variant: 'destructive',
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to delete rating');
     } finally {
       setLoading(false);
     }

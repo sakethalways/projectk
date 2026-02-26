@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface DeleteAccountModalProps {
   open: boolean;
@@ -19,7 +19,6 @@ interface DeleteAccountModalProps {
 
 export default function DeleteAccountModal({ open, onOpenChange }: DeleteAccountModalProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [password, setPassword] = useState('');
   const [understood, setUnderstood] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -73,11 +72,7 @@ export default function DeleteAccountModal({ open, onOpenChange }: DeleteAccount
       }
 
       // Success: Sign out and redirect
-      toast({
-        title: 'Account Deleted',
-        description: 'Your account and all associated data have been permanently deleted.',
-        variant: 'default',
-      });
+      toast.success('Account Deleted - Your account and all associated data have been permanently deleted.');
 
       // Clear session
       if (supabase) {

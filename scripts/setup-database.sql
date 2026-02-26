@@ -66,6 +66,21 @@ CREATE TABLE IF NOT EXISTS saved_guides (
   UNIQUE(tourist_id, guide_id)
 );
 
+-- Create bookings table
+CREATE TABLE IF NOT EXISTS bookings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  guide_id UUID NOT NULL REFERENCES guides(id) ON DELETE CASCADE,
+  tourist_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  itinerary_id UUID NOT NULL REFERENCES guide_itineraries(id) ON DELETE CASCADE,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  number_of_days INTEGER NOT NULL,
+  total_price DECIMAL(10, 2),
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+);
+
 -- Create ratings_reviews table
 CREATE TABLE IF NOT EXISTS ratings_reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -77,6 +92,43 @@ CREATE TABLE IF NOT EXISTS ratings_reviews (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
   UNIQUE(booking_id)
+);
+
+-- Create notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL CHECK (type IN (
+    'guide_approved',
+    'guide_rejected',
+    'guide_deactivated',
+    'guide_reactivated',
+    'guide_deleted',
+    'guide_saved',
+    'guide_unsaved',
+    'booking_created',
+    'booking_confirmed',
+    'booking_completed',
+    'booking_cancelled',
+    'rating_received',
+    'review_posted',
+    'review_deleted',
+    'trip_completed',
+    'tourist_login',
+    'message',
+    'admin_action',
+    'custom'
+  )),
+  title VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  data JSONB DEFAULT NULL,
+  related_user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  related_guide_id UUID REFERENCES guides(id) ON DELETE SET NULL,
+  related_booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL,
+  is_read BOOLEAN DEFAULT false,
+  read_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
 -- Create indexes
@@ -91,10 +143,23 @@ CREATE INDEX IF NOT EXISTS idx_guide_itineraries_guide_id ON guide_itineraries(g
 CREATE INDEX IF NOT EXISTS idx_saved_guides_tourist_id ON saved_guides(tourist_id);
 CREATE INDEX IF NOT EXISTS idx_saved_guides_guide_id ON saved_guides(guide_id);
 CREATE INDEX IF NOT EXISTS idx_saved_guides_tourist_guide ON saved_guides(tourist_id, guide_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_guide_id ON bookings(guide_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_tourist_id ON bookings(tourist_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_itinerary_id ON bookings(itinerary_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 CREATE INDEX IF NOT EXISTS idx_ratings_reviews_booking_id ON ratings_reviews(booking_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_reviews_tourist_id ON ratings_reviews(tourist_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_reviews_guide_id ON ratings_reviews(guide_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_reviews_tourist_guide ON ratings_reviews(tourist_id, guide_id);
+
+-- Indexes for notifications table
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_type ON notifications(type);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications(user_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_related_guide_id ON notifications(related_guide_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_related_booking_id ON notifications(related_booking_id);
 
 -- Enable RLS on tables
 ALTER TABLE guides ENABLE ROW LEVEL SECURITY;
@@ -102,7 +167,9 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE guide_availability ENABLE ROW LEVEL SECURITY;
 ALTER TABLE guide_itineraries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE saved_guides ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ratings_reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for guides table
 CREATE POLICY "guides_read_authenticated"
@@ -197,6 +264,27 @@ CREATE POLICY "saved_guides_delete_own"
   FOR DELETE
   USING (auth.uid() = tourist_id);
 
+-- RLS Policies for bookings table
+CREATE POLICY "bookings_read_own"
+  ON bookings
+  FOR SELECT
+  USING (auth.uid() = guide_id OR auth.uid() = tourist_id);
+
+CREATE POLICY "bookings_insert_tourist"
+  ON bookings
+  FOR INSERT
+  WITH CHECK (auth.uid() = tourist_id);
+
+CREATE POLICY "bookings_update_guide_or_tourist"
+  ON bookings
+  FOR UPDATE
+  USING (auth.uid() = guide_id OR auth.uid() = tourist_id);
+
+CREATE POLICY "bookings_delete_admin"
+  ON bookings
+  FOR DELETE
+  USING ((SELECT role FROM users WHERE id = auth.uid()) = 'admin');
+
 -- RLS Policies for ratings_reviews table
 CREATE POLICY "ratings_reviews_read_all"
   ON ratings_reviews
@@ -220,6 +308,27 @@ CREATE POLICY "ratings_reviews_delete_tourist_or_admin"
     auth.uid() = tourist_id OR 
     (SELECT role FROM users WHERE id = auth.uid()) = 'admin'
   );
+
+-- RLS Policies for notifications table
+CREATE POLICY "notifications_read_own"
+  ON notifications
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "notifications_insert_service"
+  ON notifications
+  FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "notifications_update_own"
+  ON notifications
+  FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "notifications_delete_own"
+  ON notifications
+  FOR DELETE
+  USING (auth.uid() = user_id);
 
 -- Function to automatically create user record when auth user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendNotification } from '@/lib/send-notification';
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -100,6 +101,15 @@ export async function DELETE(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Send notification to guide about deleted review
+    await sendNotification(
+      rating.guide_id,
+      'review_deleted',
+      '🗑️ Review Deleted',
+      `A review on your profile has been deleted.`,
+      { relatedGuideId: rating.guide_id, relatedUserId: rating.tourist_id }
+    );
 
     return NextResponse.json({
       message: 'Rating deleted successfully',

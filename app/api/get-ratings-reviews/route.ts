@@ -132,18 +132,28 @@ export async function GET(request: NextRequest) {
         }
 
         if (type === 'guide' || (type === 'all' && userRole === 'admin')) {
-          // Get tourist info from auth users (minimal data)
-          const { data: { users: touristUsers } } = await supabase.auth.admin.listUsers();
-          touristData = touristUsers?.find(u => u.id === rating.tourist_id);
+          // Get tourist info from tourist_profiles table
+          const { data: profiles } = await supabase
+            .from('tourist_profiles')
+            .select('id, user_id, name, email, phone_number, location, profile_picture_url')
+            .eq('user_id', rating.tourist_id)
+            .single();
+          
+          touristData = profiles ? {
+            id: profiles.id,
+            user_id: profiles.user_id,
+            name: profiles.name,
+            email: profiles.email,
+            phone_number: profiles.phone_number,
+            location: profiles.location,
+            profile_picture_url: profiles.profile_picture_url,
+          } : null;
         }
 
         return {
           ...rating,
           guide: guideData,
-          tourist: touristData ? {
-            id: touristData.id,
-            email: touristData.email,
-          } : null,
+          tourist: touristData,
         };
       })
     );

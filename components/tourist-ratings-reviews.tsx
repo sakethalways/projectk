@@ -7,12 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, MapPin, Phone, Loader2, AlertCircle, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
+import { toast } from 'sonner';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import RatingReviewModal from './rating-review-modal';
-import { useToast } from '@/hooks/use-toast';
 
 export default function TouristRatingsReviews() {
-  const { toast } = useToast();
   const [ratings, setRatings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,11 +66,7 @@ export default function TouristRatingsReviews() {
 
   const handleDelete = async (ratingId: string) => {
     if (!supabase) {
-      toast({
-        title: 'Error',
-        description: 'Service unavailable',
-        variant: 'destructive',
-      });
+      toast.error('Service unavailable');
       return;
     }
     try {
@@ -81,11 +76,7 @@ export default function TouristRatingsReviews() {
       } = await supabase.auth.getSession();
 
       if (sessionError || !session) {
-        toast({
-          title: 'Error',
-          description: 'Please log in',
-          variant: 'destructive',
-        });
+        toast.error('Please log in');
         return;
       }
 
@@ -100,19 +91,12 @@ export default function TouristRatingsReviews() {
         throw new Error('Failed to delete rating');
       }
 
-      toast({
-        title: 'Deleted',
-        description: 'Rating has been removed',
-      });
+      toast.success('Rating has been removed');
 
       fetchRatings();
     } catch (err) {
       console.error('Error deleting rating:', err);
-      toast({
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to delete rating',
-        variant: 'destructive',
-      });
+      toast.error(err instanceof Error ? err.message : 'Failed to delete rating');
     }
   };
 

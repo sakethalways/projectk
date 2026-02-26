@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LogOut, Menu, X, LayoutDashboard, User, Edit, Home, Star, Clock, CheckCircle2, History, Calendar, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { NotificationBell } from '@/components/notification-bell';
 
 interface GuideSidebarProps {
   onLogout: () => void;
@@ -80,13 +81,16 @@ export default function GuideSidebar({ onLogout, guideName }: GuideSidebarProps)
             <Home className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <span className="font-semibold text-foreground">GuideVerify</span>
           </Link>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
-            suppressHydrationWarning
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationBell className="text-slate-700 dark:text-slate-300" />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
+              suppressHydrationWarning
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -151,15 +155,16 @@ export default function GuideSidebar({ onLogout, guideName }: GuideSidebarProps)
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col fixed left-0 top-0 w-64 h-screen bg-white dark:bg-slate-900 border-r border-border z-40">
         {/* Logo */}
-        <div className="p-6 border-b border-border">
+        <div className="p-6 border-b border-border flex items-center justify-between">
           <Link href="/guide/dashboard" className="flex items-center gap-2">
             <Home className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             <span className="text-xl font-bold text-foreground">GuideVerify</span>
           </Link>
-          {guideName && (
-            <p className="text-sm text-muted-foreground mt-2 truncate">Welcome, {guideName}</p>
-          )}
+          <NotificationBell className="text-slate-700 dark:text-slate-300" />
         </div>
+        {guideName && (
+          <p className="text-sm text-muted-foreground px-6 py-2 truncate">Welcome, {guideName}</p>
+        )}
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-6">

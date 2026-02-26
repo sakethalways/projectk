@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { LogOut, Menu, X, LayoutDashboard, Home, Shield, Star, Clock, CheckCircle2, XCircle, Users, Calendar, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { NotificationBell } from '@/components/notification-bell';
 
 interface AdminSidebarProps {
   onLogout: () => void;
@@ -96,13 +97,16 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
             <Shield className="w-5 h-5 text-red-600 dark:text-red-400" />
             <span className="font-semibold text-foreground">GuideVerify Admin</span>
           </Link>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
-            suppressHydrationWarning
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
+              suppressHydrationWarning
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -179,12 +183,15 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col fixed left-0 top-0 w-64 h-screen bg-white dark:bg-slate-900 border-r border-border z-40">
         {/* Logo */}
-        <div className="p-6 border-b border-border">
-          <Link href="/admin/dashboard" className="flex items-center gap-2">
-            <Shield className="w-6 h-6 text-red-600 dark:text-red-400" />
-            <span className="text-xl font-bold text-foreground">Admin Panel</span>
-          </Link>
-          <p className="text-sm text-muted-foreground mt-2">GuideVerify</p>
+        <div className="p-6 border-b border-border flex items-center justify-between">
+          <div className="flex-1">
+            <Link href="/admin/dashboard" className="flex items-center gap-2">
+              <Shield className="w-6 h-6 text-red-600 dark:text-red-400" />
+              <span className="text-xl font-bold text-foreground">Admin Panel</span>
+            </Link>
+            <p className="text-sm text-muted-foreground mt-2">GuideVerify</p>
+          </div>
+          <NotificationBell />
         </div>
 
         {/* Navigation */}

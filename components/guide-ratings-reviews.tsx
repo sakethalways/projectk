@@ -136,9 +136,9 @@ export default function GuideRatingsReviews() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-semibold text-foreground">
-                      Tourist #{rating.tourist?.email?.split('@')[0] || 'Anonymous'}
+                      {rating.tourist?.name || 'Anonymous Tourist'}
                     </p>
-                    <p className="text-sm text-muted-foreground">{rating.tourist?.email}</p>
+                    <p className="text-sm text-muted-foreground">{rating.tourist?.location || 'N/A'}</p>
                   </div>
 
                   {/* Stars */}

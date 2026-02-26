@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendNotification } from '@/lib/send-notification';
 
 export async function POST(request: NextRequest) {
   try {
@@ -130,6 +131,44 @@ export async function POST(request: NextRequest) {
           { error: error.message },
           { status: 500 }
         );
+      }
+
+      // Send notification to guide about rating
+      await sendNotification(
+        booking.guide_id,
+        'rating_received',
+        `⭐ ${rating}-Star Rating`,
+        `A tourist gave you a ${rating}-star rating for your tour${review_text ? ' with a review' : ''}.`,
+        { relatedBookingId: booking_id, relatedUserId: user.id }
+      );
+
+      // If review text is provided, also send review_posted notification
+      if (review_text && review_text.trim()) {
+        await sendNotification(
+          booking.guide_id,
+          'review_posted',
+          '💬 New Review Posted',
+          `A tourist posted a review: "${review_text.substring(0, 100)}${review_text.length > 100 ? '...' : ''}"`,
+          { relatedBookingId: booking_id, relatedUserId: user.id }
+        );
+      }
+
+      // Notify all admins about new rating
+      const { data: admins } = await supabase
+        .from('users')
+        .select('id')
+        .eq('role', 'admin');
+
+      if (admins && admins.length > 0) {
+        for (const admin of admins) {
+          await sendNotification(
+            admin.id,
+            'rating_received',
+            `⭐ ${rating}-Star Rating Submitted`,
+            `A new ${rating}-star rating has been submitted for a guide.`,
+            { relatedBookingId: booking_id }
+          );
+        }
       }
 
       return NextResponse.json({
