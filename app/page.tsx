@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MapPin, Users, CheckCircle, Star, Globe, TrendingUp } from 'lucide-react';
@@ -78,9 +79,23 @@ export default function Home() {
               Connect with Local Guides
             </h2>
 
-            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-12 sm:mb-16 max-w-2xl mx-auto leading-relaxed">
               Experience authentic travel with verified local guides. Book tours, explore hidden gems, and create unforgettable memories.
             </p>
+
+            {/* Hero Illustration */}
+            <div className="flex justify-center mb-12 sm:mb-16">
+              <div className="relative w-full max-w-md">
+                <Image
+                  src="/guido-hero.png"
+                  alt="GUIDO Hero Illustration"
+                  width={500}
+                  height={500}
+                  priority
+                  className="w-full h-auto drop-shadow-lg"
+                />
+              </div>
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
               <Link href="/guide/signup">
