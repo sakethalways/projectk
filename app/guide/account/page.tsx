@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/lib/supabase-client';
-import GuideSidebar from '@/components/guide-sidebar';
+import ResponsiveContainer from '@/components/layouts/ResponsiveContainer';
 import MultiLanguageSelect from '@/components/multi-language-select';
 import { LocationAutocomplete } from '@/components/location-autocomplete';
 import DeleteAccountModal from '@/components/delete-account-modal';
@@ -224,12 +224,7 @@ export default function GuideAccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex flex-col lg:flex-row">
-      {/* Sidebar */}
-      <GuideSidebar onLogout={handleLogout} />
-
-      {/* Main Content */}
-      <main className="flex-1 w-full lg:w-0 px-4 sm:px-6 py-6 sm:py-10 max-w-2xl mx-auto">
+    <ResponsiveContainer>
         <div className="mb-8">
           <button
             onClick={() => router.back()}
@@ -444,10 +439,9 @@ export default function GuideAccountPage() {
             Delete My Account
           </Button>
         </Card>
-      </main>
 
-      {/* Delete Account Modal */}
-      <DeleteAccountModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} />
-    </div>
+        {/* Delete Account Modal */}
+        <DeleteAccountModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} />
+    </ResponsiveContainer>
   );
 }

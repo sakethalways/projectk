@@ -1,0 +1,202 @@
+/**
+ * GUIDO Design Tokens
+ * Emerald Green + Cream Color System
+ * Generated from UI_DESIGN_RESEARCH.md design system
+ */
+
+/* ========================================
+   COLOR TOKENS - GUIDO DESIGN SYSTEM
+   ======================================== */
+
+/* Primary Colors */
+:root {
+  /* Emerald Green Palette */
+  --color-emerald-50: #F0FFFE;
+  --color-emerald-100: #D1FAE5;
+  --color-emerald-200: #A7F3D0;
+  --color-emerald-300: #6EE7B7;
+  --color-emerald-400: #34D399;
+  --color-emerald-500: #10B981; /* PRIMARY */
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857; /* ACTIVE */
+  --color-emerald-800: #065F46;
+  --color-emerald-900: #064E3B;
+
+  /* Cream Background Palette */
+  --color-cream-50: #FFFBF8;
+  --color-cream-100: #F9F7F4; /* BACKGROUND */
+  --color-cream-200: #F3F0EB;
+  --color-cream-300: #E8E4DF;
+  --color-cream-400: #D7D1C6;
+  --color-cream-500: #C5BDB2;
+
+  /* Gray Scale (Neutral) */
+  --color-gray-50: #F9FAFB;
+  --color-gray-100: #F3F4F6;
+  --color-gray-200: #E5E7EB;
+  --color-gray-300: #D1D5DB;
+  --color-gray-400: #9CA3AF;
+  --color-gray-500: #6B7280;
+  --color-gray-600: #4B5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937; /* TEXT DARK */
+  --color-gray-900: #111827;
+
+  /* Status Colors */
+  --color-success: #059669; /* Dark Green */
+  --color-warning: #F59E0B; /* Amber */
+  --color-error: #DC2626; /* Red */
+  --color-info: #0891B2; /* Teal */
+  --color-pending: #FBBF24; /* Yellow */
+
+  /* Text Colors */
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #F9FAFB;
+
+  /* Dark Mode Palette */
+  --color-dark-bg: #0F172A;
+  --color-dark-surface: #1E293B;
+  --color-dark-text: #F1F5F9;
+  --color-dark-emerald: #6EE7B7;
+  --color-dark-magenta: #EC4899;
+  --color-dark-teal: #06B6D4;
+}
+
+/* ========================================
+   TYPOGRAPHY TOKENS
+   ======================================== */
+:root {
+  /* Font Families */
+  --font-sans: 'Inter', 'Geist', 'Geist Fallback', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Geist Mono', 'Geist Mono Fallback', monospace;
+
+  /* Mobile Type Scale */
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 28px;
+  --font-size-5xl: 32px;
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+}
+
+/* ========================================
+   SPACING TOKENS (8px Grid)
+   ======================================== */
+:root {
+  --spacing-xs: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  --spacing-4xl: 80px;
+}
+
+/* ========================================
+   COMPONENT TOKENS
+   ======================================== */
+:root {
+  /* Button Sizing */
+  --button-height-sm: 32px;
+  --button-height-md: 40px;
+  --button-height-lg: 44px;
+  --button-padding-x: 16px;
+  --button-padding-y: 12px;
+
+  /* Input Sizing */
+  --input-height-mobile: 44px;
+  --input-height-desktop: 40px;
+  --input-padding-x: 16px;
+  --input-padding-y: 12px;
+
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Border Width */
+  --border-width-thin: 1px;
+  --border-width-thick: 2px;
+
+  /* Shadow Elevation */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   MEDIA QUERIES (Breakpoints)
+   ======================================== */
+@media (min-width: 640px) {
+  :root {
+    /* Tablet Type Scale */
+    --font-size-base: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 18px;
+    --font-size-2xl: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    /* Desktop Type Scale */
+    --font-size-base: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --font-size-3xl: 28px;
+    --font-size-4xl: 36px;
+    --font-size-5xl: 48px;
+
+    /* Desktop Spacing */
+    --button-height-md: 40px;
+    --input-height-desktop: 40px;
+  }
+}
+
+/* ========================================
+   ANIMATION TOKENS
+   ======================================== */
+:root {
+  --animation-duration-micro: 150ms;
+  --animation-duration-short: 300ms;
+  --animation-duration-normal: 500ms;
+  --animation-easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-easing-out: cubic-bezier(0.0, 0, 0.2, 1);
+  --animation-easing-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ========================================
+   Z-INDEX SCALE
+   ======================================== */
+:root {
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}

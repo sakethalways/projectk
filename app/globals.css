@@ -1,82 +1,139 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import '../lib/design-tokens.css';
 
 @custom-variant dark (&:is(.dark *));
 
+/**
+ * GUIDO Theme - Light Mode (Emerald + Cream)
+ * Primary: Emerald Green (#10B981)
+ * Background: Cream (#F9F7F4)
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Background & Foreground */
+  --background: #F9F7F4;
+  --foreground: #1F2937;
+  
+  /* Card Styling */
+  --card: #FFFFFF;
+  --card-foreground: #1F2937;
+  
+  /* Popover */
+  --popover: #FFFFFF;
+  --popover-foreground: #1F2937;
+  
+  /* Primary (Emerald Green) */
+  --primary: #10B981;
+  --primary-foreground: #FFFFFF;
+  
+  /* Secondary (Light Gray) */
+  --secondary: #F3F4F6;
+  --secondary-foreground: #1F2937;
+  
+  /* Muted (Gray Tones) */
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280;
+  
+  /* Accent (Teal) */
+  --accent: #0891B2;
+  --accent-foreground: #FFFFFF;
+  
+  /* Destructive (Red) */
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  
+  /* Borders & Inputs */
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  
+  /* Focus Ring (Emerald with opacity) */
+  --ring: #10B981;
+  
+  /* Chart Colors */
+  --chart-1: #10B981; /* Emerald */
+  --chart-2: #0891B2; /* Teal */
+  --chart-3: #F59E0B; /* Amber */
+  --chart-4: #EC4899; /* Magenta */
+  --chart-5: #8B5CF6; /* Purple */
+  
+  /* Border Radius */
+  --radius: 12px;
+  
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1F2937;
+  --sidebar-primary: #10B981;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F3F4F6;
+  --sidebar-accent-foreground: #1F2937;
+  --sidebar-border: #E5E7EB;
+  --sidebar-ring: #10B981;
 }
 
+/**
+ * Dark Mode (Dark Navy + Emerald/Teal/Magenta Accents)
+ */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Background & Foreground */
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  
+  /* Card Styling */
+  --card: #1E293B;
+  --card-foreground: #F1F5F9;
+  
+  /* Popover */
+  --popover: #1E293B;
+  --popover-foreground: #F1F5F9;
+  
+  /* Primary (Bright Emerald for dark mode) */
+  --primary: #6EE7B7;
+  --primary-foreground: #0F172A;
+  
+  /* Secondary */
+  --secondary: #334155;
+  --secondary-foreground: #F1F5F9;
+  
+  /* Muted */
+  --muted: #334155;
+  --muted-foreground: #94A3B8;
+  
+  /* Accent (Teal) */
+  --accent: #06B6D4;
+  --accent-foreground: #0F172A;
+  
+  /* Destructive */
+  --destructive: #DC2626;
+  --destructive-foreground: #F1F5F9;
+  
+  /* Borders & Inputs */
+  --border: #334155;
+  --input: #334155;
+  
+  /* Focus Ring */
+  --ring: #6EE7B7;
+  
+  /* Chart Colors (Dark Mode Variants) */
+  --chart-1: #6EE7B7; /* Bright Emerald */
+  --chart-2: #06B6D4; /* Cyan/Teal */
+  --chart-3: #EC4899; /* Magenta */
+  --chart-4: #F59E0B; /* Amber */
+  --chart-5: #A78BFA; /* Purple */
+  
+  /* Sidebar */
+  --sidebar: #1E293B;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-primary: #6EE7B7;
+  --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #F1F5F9;
+  --sidebar-border: #334155;
+  --sidebar-ring: #6EE7B7;
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: 'Inter', 'Geist', 'Geist Fallback', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Geist Mono', 'Geist Mono Fallback', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

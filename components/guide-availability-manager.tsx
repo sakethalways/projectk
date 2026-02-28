@@ -9,11 +9,13 @@ import { Calendar, ToggleLeft, ToggleRight, X, Plus, Loader2 } from 'lucide-reac
 import type { GuideAvailability } from '@/lib/supabase-client';
 
 interface GuideAvailabilityProps {
-  guideId: string;
-  userId: string;
+  guideId?: string;
+  userId?: string;
 }
 
-export default function GuideAvailabilityManager({ guideId, userId }: GuideAvailabilityProps) {
+export default function GuideAvailabilityManager({ guideId: propGuideId, userId: propUserId }: GuideAvailabilityProps) {
+  const [guideId, setGuideId] = useState<string | undefined>(propGuideId);
+  const [userId, setUserId] = useState<string | undefined>(propUserId);
   const [availability, setAvailability] = useState<GuideAvailability | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -24,8 +26,35 @@ export default function GuideAvailabilityManager({ guideId, userId }: GuideAvail
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Load guide info if not provided
+  useEffect(() => {
+    if (!guideId) {
+      const loadGuide = async () => {
+        try {
+          if (!supabase) return;
+          const { data: authData } = await supabase.auth.getUser();
+          if (!authData.user) return;
+          setUserId(authData.user.id);
+
+          const { data: guideData } = await supabase
+            .from('guides')
+            .select('*')
+            .eq('user_id', authData.user.id)
+            .single();
+          
+          if (guideData) setGuideId(guideData.id);
+        } catch (err) {
+          console.error('Error loading guide:', err);
+        }
+      };
+      loadGuide();
+    }
+  }, []);
+
   // Fetch availability
   useEffect(() => {
+    if (!guideId) return;
+    
     const fetchAvailability = async () => {
       try {
         if (!supabase) {

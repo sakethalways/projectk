@@ -1,18 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { TouristSidebar } from '@/components/tourist-sidebar';
-import { Loader2, AlertCircle, CheckCircle2, Upload, Trash2 } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Upload, Trash2, Home, MapPin, Calendar, Compass, Heart, Star } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { LocationAutocomplete } from '@/components/location-autocomplete';
 import DeleteAccountModal from '@/components/delete-account-modal';
+import ResponsiveContainer from '@/components/layouts/ResponsiveContainer';
 
 interface TouristProfile {
   id: string;
@@ -268,273 +269,297 @@ export default function TouristDashboardPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <TouristSidebar />
+    <ResponsiveContainer>
+        {/* Profile Section Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-dark-text mb-2">
+            Welcome, {profile.name}! 👋
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+            Manage your profile and explore verified guides
+          </p>
+        </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8">
-            {/* Header */}
-            <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-              Welcome, {profile.name}! 👋
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Manage your profile and explore verified guides
-            </p>
-          </div>
+        {/* Quick Stats */}
+        <div className="grid sm:grid-cols-3 gap-4 mb-8">
+          {/* Member Status */}
+          <Card className="border border-emerald-200 dark:border-slate-700 p-6 bg-white dark:bg-dark-surface">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-emerald-600 mb-2">Active</div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Member Status</p>
+            </div>
+          </Card>
 
-          {/* Quick Stats */}
-          <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
-            {/* Member Status */}
-            <Card className="border border-border p-4 sm:p-6">
-              <div className="text-center">
-                <div className="inline-block mb-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-100 rounded-full text-xs font-semibold">
-                  Active ✓
-                </div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Status</p>
+          {/* Member Since */}
+          <Card className="border border-emerald-200 dark:border-slate-700 p-6 bg-white dark:bg-dark-surface">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900 dark:text-dark-text mb-2">
+                {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Member Since</p>
+            </div>
+          </Card>
+
+          {/* Location */}
+          <Card className="border border-emerald-200 dark:border-slate-700 p-6 bg-white dark:bg-dark-surface">
+            <div className="text-center truncate">
+              <p className="text-2xl font-bold text-gray-900 dark:text-dark-text mb-2">📍</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{profile.location || 'Not set'}</p>
+            </div>
+          </Card>
+        </div>
+
+        {/* Profile Card */}
+        <Card className="border border-emerald-200 dark:border-slate-700 p-8 mb-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-700 shadow-md">
+          <div className="flex flex-col sm:flex-row items-center gap-8">
+            {/* Profile Picture */}
+            {profile.profile_picture_url ? (
+              <img
+                src={profile.profile_picture_url}
+                alt={profile.name}
+                className="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-slate-700 flex-shrink-0 shadow-lg"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-4xl font-bold text-white flex-shrink-0 shadow-lg">
+                {profile.name.charAt(0).toUpperCase()}
               </div>
-            </Card>
-
-            {/* Member Since */}
-            <Card className="border border-border p-4 sm:p-6">
-              <div className="text-center">
-                <p className="text-lg sm:text-2xl font-bold text-foreground mb-1 sm:mb-2">
-                  {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                </p>
-                <p className="text-xs sm:text-sm text-muted-foreground">Member Since</p>
-              </div>
-            </Card>
-
-            {/* Location */}
-            <Card className="border border-border p-4 sm:p-6">
-              <div className="text-center">
-                <p className="text-lg sm:text-2xl font-bold text-foreground mb-1 sm:mb-2 truncate px-1">
-                  📍
-                </p>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">{profile.location}</p>
-              </div>
-            </Card>
-          </div>
-
-          {/* Profile Card */}
-          <Card className="border border-emerald-200 dark:border-emerald-800 p-6 sm:p-8 mb-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
-            <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
-              {/* Profile Picture */}
-              {profile.profile_picture_url && (
-                <img
-                  src={profile.profile_picture_url}
-                  alt={profile.name}
-                  className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white dark:border-slate-700 flex-shrink-0 shadow-lg"
-                />
-              )}
-              
-              {/* Profile Info */}
-              <div className="text-center sm:text-left flex-1">
-                <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{profile.name}</h3>
-                <div className="space-y-2 mb-4">
-                  <p className="text-sm text-muted-foreground break-all">{profile.email}</p>
-                  <p className="text-sm text-foreground"><span className="font-semibold">Phone:</span> {profile.phone_number}</p>
-                  <p className="text-sm text-foreground"><span className="font-semibold">Location:</span> {profile.location}</p>
-                </div>
+            )}
+            
+            {/* Profile Info */}
+            <div className="text-center sm:text-left flex-1">
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-dark-text mb-4">{profile.name}</h3>
+              <div className="space-y-2 mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 break-all">{profile.email}</p>
+                <p className="text-sm text-gray-900 dark:text-dark-text"><span className="font-semibold">Phone:</span> {profile.phone_number || 'Not set'}</p>
+                <p className="text-sm text-gray-900 dark:text-dark-text"><span className="font-semibold">Location:</span> {profile.location || 'Not set'}</p>
               </div>
 
               {/* Edit Button */}
               {!editing && (
                 <Button
                   onClick={() => setEditing(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto"
+                  className="bg-emerald-600 hover:bg-emerald-700"
                 >
                   Edit Profile
                 </Button>
               )}
             </div>
-          </Card>
+          </div>
+        </Card>
 
-          {/* Alerts */}
-          {error && (
-            <Alert variant="destructive" className="mb-4 sm:mb-6">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
-            </Alert>
-          )}
+        {/* Quick Links Section */}
+        <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
+          <Link href="/tourist/booking-status" className="block">
+            <Card className="border border-emerald-200 dark:border-slate-700 p-6 bg-white dark:bg-dark-surface hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-center gap-3">
+                <MapPin className="w-6 h-6 text-emerald-600" />
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-dark-text">My Bookings</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">View and manage bookings</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
 
-          {success && (
-            <Alert className="mb-4 sm:mb-6 border-green-200 bg-green-50 dark:bg-green-950">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-xs sm:text-sm text-green-800 dark:text-green-200">
-                {success}
-              </AlertDescription>
-            </Alert>
-          )}
+          <Link href="/tourist/past-bookings" className="block">
+            <Card className="border border-emerald-200 dark:border-slate-700 p-6 bg-white dark:bg-dark-surface hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-center gap-3">
+                <Calendar className="w-6 h-6 text-emerald-600" />
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-dark-text">Past Bookings</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Your trip history</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
 
-          {/* Edit Form */}
-            {editing && (
-              <Card className="border border-border p-6 sm:p-8 bg-slate-50 dark:bg-slate-900/50">
-                <h3 className="text-2xl font-bold text-foreground mb-6">Edit Profile</h3>
+          <Link href="/tourist/my-ratings" className="block">
+            <Card className="border border-emerald-200 dark:border-slate-700 p-6 bg-white dark:bg-dark-surface hover:shadow-md transition-shadow cursor-pointer">
+              <div className="flex items-center gap-3">
+                <Star className="w-6 h-6 text-emerald-600" />
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-dark-text">Ratings</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Your reviews & ratings</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+        </div>
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-sm">{error}</AlertDescription>
+          </Alert>
+        )}
 
-                <form className="space-y-5">
-                  {/* Name */}
-                  <div>
-                    <Label className="text-sm font-semibold">Full Name</Label>
-                    <Input
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Your full name"
-                      className="text-sm mt-2"
-                      disabled={saving}
-                    />
-                  </div>
+        {success && (
+          <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-950">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-sm text-green-800 dark:text-green-200">
+              {success}
+            </AlertDescription>
+          </Alert>
+        )}
 
-                  {/* Phone */}
-                  <div>
-                    <Label className="text-sm font-semibold">Phone Number</Label>
-                    <Input
-                      name="phone_number"
-                      value={formData.phone_number}
-                      onChange={handleInputChange}
-                      placeholder="+91..."
-                      className="text-sm mt-2"
-                      disabled={saving}
-                    />
-                  </div>
+        {/* Edit Form */}
+        {editing && (
+          <Card className="border border-emerald-200 dark:border-slate-700 p-8 bg-white dark:bg-dark-surface mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text mb-6">Edit Profile</h3>
 
-                  {/* Location */}
-                  <div>
-                    <Label className="text-sm font-semibold">Location</Label>
-                    <LocationAutocomplete
-                      value={formData.location}
-                      onChange={(value) =>
-                        setFormData((prev) => ({ ...prev, location: value }))
-                      }
-                      placeholder="Search location..."
-                      disabled={saving}
-                      apiKey={process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY || ''}
-                    />
-                  </div>
-
-                  {/* Profile Picture */}
-                  <div>
-                    <Label className="text-sm font-semibold">Update Profile Picture</Label>
-                    <div className="mt-2 border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-emerald-400 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        onChange={handleFileChange}
-                        className="hidden"
-                        id="edit-profile-picture-input"
-                        disabled={saving}
-                      />
-                      <label htmlFor="edit-profile-picture-input" className="cursor-pointer block">
-                        {files.profile_picture ? (
-                          <div className="space-y-2">
-                            <img
-                              src={preview.profile}
-                              alt="Preview"
-                              className="w-24 h-24 rounded-lg object-cover mx-auto border-2 border-emerald-200"
-                            />
-                            <p className="text-xs sm:text-sm text-muted-foreground">
-                              Click to change
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Upload className="w-8 h-8 mx-auto text-emerald-500" />
-                            <p className="text-sm font-medium text-foreground">
-                              Click to update profile picture
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Max 5MB • JPEG, PNG, WebP
-                            </p>
-                          </div>
-                        )}
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="flex gap-4 pt-6 border-t border-border">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setEditing(false);
-                        setFiles({ profile_picture: null });
-                        setFormData({
-                          name: profile.name,
-                          phone_number: profile.phone_number,
-                          location: profile.location,
-                        });
-                        setPreview({ profile: profile.profile_picture_url || '' });
-                      }}
-                      disabled={saving}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleSaveProfile}
-                      disabled={saving}
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-700"
-                    >
-                      {saving ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        'Save Changes'
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </Card>
-            )}
-
-            {/* Danger Zone - Delete Account */}
-            <Card className="border border-red-200 bg-red-50 dark:bg-red-950 p-6 mt-8">
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">
-                  Danger Zone
-                </h2>
-                <p className="text-sm text-red-600 dark:text-red-400 mt-1">
-                  Irreversible actions
-                </p>
+            <form className="space-y-6">
+              {/* Name */}
+              <div>
+                <Label className="text-sm font-semibold">Full Name</Label>
+                <Input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Your full name"
+                  className="mt-2"
+                  disabled={saving}
+                />
               </div>
 
-              <Alert className="mb-4 border-red-300 bg-red-100 dark:bg-red-900">
-                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                <AlertDescription className="text-red-800 dark:text-red-200">
-                  Deleting your account will permanently remove all your data including bookings,
-                  ratings, reviews, and saved guides. This action cannot be undone.
-                </AlertDescription>
-              </Alert>
+              {/* Phone */}
+              <div>
+                <Label className="text-sm font-semibold">Phone Number</Label>
+                <Input
+                  name="phone_number"
+                  value={formData.phone_number}
+                  onChange={handleInputChange}
+                  placeholder="+91..."
+                  className="mt-2"
+                  disabled={saving}
+                />
+              </div>
 
-              <Button
-                onClick={() => setDeleteModalOpen(true)}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete My Account
-              </Button>
-            </Card>
+              {/* Location */}
+              <div>
+                <Label className="text-sm font-semibold">Location</Label>
+                <LocationAutocomplete
+                  value={formData.location}
+                  onChange={(value) =>
+                    setFormData((prev) => ({ ...prev, location: value }))
+                  }
+                  placeholder="Search location..."
+                  disabled={saving}
+                  apiKey={process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY || ''}
+                />
+              </div>
+
+              {/* Profile Picture */}
+              <div>
+                <Label className="text-sm font-semibold">Update Profile Picture</Label>
+                <div className="mt-2 border-2 border-dashed border-emerald-200 dark:border-slate-600 rounded-lg p-8 text-center cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="edit-profile-picture-input"
+                    disabled={saving}
+                  />
+                  <label htmlFor="edit-profile-picture-input" className="cursor-pointer block">
+                    {files.profile_picture ? (
+                      <div className="space-y-2">
+                        <img
+                          src={preview.profile}
+                          alt="Preview"
+                          className="w-24 h-24 rounded-lg object-cover mx-auto border-2 border-emerald-200"
+                        />
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Click to change
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Upload className="w-8 h-8 mx-auto text-emerald-500" />
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                          Click to update profile picture
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          Max 5MB • JPEG, PNG, WebP
+                        </p>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-4 pt-6 border-t border-emerald-200 dark:border-slate-700">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setEditing(false);
+                    setFiles({ profile_picture: null });
+                    setFormData({
+                      name: profile.name,
+                      phone_number: profile.phone_number,
+                      location: profile.location,
+                    });
+                    setPreview({ profile: profile.profile_picture_url || '' });
+                  }}
+                  disabled={saving}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSaveProfile}
+                  disabled={saving}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        )}
+
+        {/* Danger Zone - Delete Account */}
+        <Card className="border border-red-200 bg-red-50 dark:bg-red-950 p-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-red-700 dark:text-red-300">
+              Danger Zone
+            </h2>
+            <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+              Irreversible actions
+            </p>
           </div>
-        </div>
-      </div>
 
-      {/* Delete Account Modal */}
-      <DeleteAccountModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} />
-    </div>
+          <Alert className="mb-4 border-red-300 bg-red-100 dark:bg-red-900">
+            <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+            <AlertDescription className="text-red-800 dark:text-red-200">
+              Deleting your account will permanently remove all your data including bookings,
+              ratings, reviews, and saved guides. This action cannot be undone.
+            </AlertDescription>
+          </Alert>
+
+          <Button
+            onClick={() => setDeleteModalOpen(true)}
+            className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete My Account
+          </Button>
+        </Card>
+      </ResponsiveContainer>
   );
 }

@@ -9,8 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { Booking } from '@/lib/supabase-client';
-import { Loader2, AlertCircle, CheckCircle, XCircle, Clock, Trash2, RotateCw, Star } from 'lucide-react';
-import { TouristSidebar } from '@/components/tourist-sidebar';
+import { Loader2, AlertCircle, CheckCircle, XCircle, Clock, Trash2, RotateCw, Star, MapPin, Heart, Compass } from 'lucide-react';
+import ResponsiveContainer from '@/components/layouts/ResponsiveContainer';
 import RebookGuideModal from '@/components/rebook-guide-modal';
 import RatingReviewModal from '@/components/rating-review-modal';
 
@@ -29,6 +29,8 @@ interface BookingWithDetails extends Booking {
 
 export default function PastBookingsPage() {
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [bookings, setBookings] = useState<BookingWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -36,6 +38,13 @@ export default function PastBookingsPage() {
   const [viewingItinerary, setViewingItinerary] = useState<BookingWithDetails | null>(null);
   const [rebookingBooking, setRebookingBooking] = useState<BookingWithDetails | null>(null);
   const [ratingBooking, setRatingBooking] = useState<BookingWithDetails | null>(null);
+
+  const handleLogout = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    localStorage.removeItem('tourist_id');
+    router.push('/');
+  };
 
   useEffect(() => {
     const checkAuthAndLoad = async () => {
@@ -52,6 +61,17 @@ export default function PastBookingsPage() {
           router.push('/tourist/login');
           return;
         }
+
+        setUser(authData.user);
+
+        // Fetch tourist profile
+        const { data: profileData } = await supabase
+          .from('tourist_profiles')
+          .select('*')
+          .eq('user_id', authData.user.id)
+          .single();
+
+        if (profileData) setProfile(profileData);
 
         // Load bookings
         await loadBookings(authData.user.id);
@@ -148,12 +168,8 @@ export default function PastBookingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex flex-col lg:flex-row">
-      {/* Sidebar */}
-      <TouristSidebar />
-
-      {/* Main Content */}
-      <main className="flex-1 w-full lg:w-0 px-4 sm:px-6 py-6 sm:py-10 max-w-5xl mx-auto">
+    <>
+      <ResponsiveContainer>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Past Bookings</h1>
@@ -276,7 +292,7 @@ export default function PastBookingsPage() {
             ))}
           </div>
         )}
-      </main>
+      </ResponsiveContainer>
 
       {/* Itinerary Modal */}
       {viewingItinerary && (
@@ -285,7 +301,9 @@ export default function PastBookingsPage() {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">Trip Details</h2>
-                <p className="text-muted-foreground">{viewingItinerary.guide?.name} - {viewingItinerary.guide?.location}</p>
+                {viewingItinerary && (
+                  <p className="text-muted-foreground">{viewingItinerary.guide?.name} - {viewingItinerary.guide?.location}</p>
+                )}
               </div>
               <button
                 onClick={() => setViewingItinerary(null)}
@@ -440,6 +458,6 @@ export default function PastBookingsPage() {
           }}
         />
       )}
-    </div>
+    </>
   );
 }

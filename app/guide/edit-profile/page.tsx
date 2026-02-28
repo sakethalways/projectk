@@ -13,7 +13,7 @@ import { Loader2, AlertCircle, CheckCircle2, Upload, ExternalLink, Trash2 } from
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import MultiLanguageSelect from '@/components/multi-language-select';
 import { LocationAutocomplete } from '@/components/location-autocomplete';
-import GuideSidebar from '@/components/guide-sidebar';
+import ResponsiveContainer from '@/components/layouts/ResponsiveContainer';
 import DeleteAccountModal from '@/components/delete-account-modal';
 import type { Guide } from '@/lib/supabase-client';
 
@@ -294,12 +294,7 @@ export default function EditProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex flex-col lg:flex-row">
-      {/* Sidebar */}
-      <GuideSidebar onLogout={handleLogout} guideName={guide.name} />
-
-      {/* Main Content */}
-      <main className="flex-1 w-full lg:w-0 px-4 sm:px-6 py-6 sm:py-10 max-w-3xl mx-auto">
+    <ResponsiveContainer>
         <div className="mb-4 sm:mb-6">
           <Link href="/guide/dashboard">
             <Button variant="outline" size="sm" className="text-xs sm:text-sm">← Back to Dashboard</Button>
@@ -491,10 +486,9 @@ export default function EditProfilePage() {
             Delete My Account
           </Button>
         </Card>
-      </main>
 
-      {/* Delete Account Modal */}
-      <DeleteAccountModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} />
-    </div>
+        {/* Delete Account Modal */}
+        <DeleteAccountModal open={deleteModalOpen} onOpenChange={setDeleteModalOpen} />
+    </ResponsiveContainer>
   );
 }

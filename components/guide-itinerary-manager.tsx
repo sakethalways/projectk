@@ -8,11 +8,13 @@ import { MapPin, Clock, FileText, AlertCircle, Plus, Trash2, Edit2, Upload, Load
 import type { GuideItinerary } from '@/lib/supabase-client';
 
 interface GuideItineraryProps {
-  guideId: string;
-  userId: string;
+  guideId?: string;
+  userId?: string;
 }
 
-export default function GuideItineraryManager({ guideId, userId }: GuideItineraryProps) {
+export default function GuideItineraryManager({ guideId: propGuideId, userId: propUserId }: GuideItineraryProps) {
+  const [guideId, setGuideId] = useState<string | undefined>(propGuideId);
+  const [userId, setUserId] = useState<string | undefined>(propUserId);
   const [itineraries, setItineraries] = useState<GuideItinerary[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,8 +45,35 @@ export default function GuideItineraryManager({ guideId, userId }: GuideItinerar
     image2: null,
   });
 
+  // Load guide info if not provided
+  useEffect(() => {
+    if (!guideId) {
+      const loadGuide = async () => {
+        try {
+          if (!supabase) return;
+          const { data: authData } = await supabase.auth.getUser();
+          if (!authData.user) return;
+          setUserId(authData.user.id);
+
+          const { data: guideData } = await supabase
+            .from('guides')
+            .select('*')
+            .eq('user_id', authData.user.id)
+            .single();
+          
+          if (guideData) setGuideId(guideData.id);
+        } catch (err) {
+          console.error('Error loading guide:', err);
+        }
+      };
+      loadGuide();
+    }
+  }, []);
+
   // Fetch itineraries
   useEffect(() => {
+    if (!guideId) return;
+    
     const fetchItineraries = async () => {
       try {
         if (!supabase) {

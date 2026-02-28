@@ -94,68 +94,64 @@ export default function TouristLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800 py-8 px-3 sm:px-6 flex flex-col justify-center">
+    <div className="min-h-screen bg-cream-100 dark:bg-dark-bg py-6 sm:py-8 px-3 sm:px-6 flex flex-col justify-center">
       <div className="max-w-md mx-auto w-full">
         {/* Back Button */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="text-xs sm:text-sm">
+            <Button variant="ghost" size="sm" className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">
               ← Back to Home
             </Button>
           </Link>
         </div>
 
         {/* Login Card */}
-        <Card className="border border-emerald-200 dark:border-emerald-800 p-8 bg-white dark:bg-slate-800 shadow-lg">
-          <div className="text-center mb-8">
-            <div className="inline-block mb-3 p-3 bg-emerald-100 dark:bg-emerald-900 rounded-full">
-              <MapPin className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+        <Card className="border border-emerald-200 dark:border-slate-700 p-6 sm:p-8 bg-white dark:bg-dark-surface shadow-lg">
+          <div className="mb-2 flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <MapPin className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Sign in to explore verified guides
-            </p>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-dark-text">Tourist Login</h1>
+            </div>
           </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            Sign in to explore verified guides and book experiences
+          </p>
 
           {error && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+            <Alert className="mb-4 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+              <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+              <AlertDescription className="text-red-700 dark:text-red-300 text-xs sm:text-sm">{error}</AlertDescription>
             </Alert>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4">
             {/* Email */}
-            <div>
-              <Label className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <Mail className="w-4 h-4" /> Email
-              </Label>
+            <div className="space-y-2">
+              <Label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</Label>
               <Input
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="your@email.com"
-                className="text-sm"
+                className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
                 disabled={loading}
                 autoComplete="email"
               />
             </div>
 
             {/* Password */}
-            <div>
-              <Label className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <Lock className="w-4 h-4" /> Password
-              </Label>
+            <div className="space-y-2">
+              <Label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Password</Label>
               <Input
                 name="password"
                 type="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="Enter password"
-                className="text-sm"
+                placeholder="••••••••"
+                className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
                 disabled={loading}
                 autoComplete="current-password"
               />
@@ -165,7 +161,7 @@ export default function TouristLoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full text-base bg-emerald-600 hover:bg-emerald-700 mt-8"
+              className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
             >
               {loading ? (
                 <>
@@ -178,27 +174,23 @@ export default function TouristLoginPage() {
             </Button>
           </form>
 
-          {/* Signup Link */}
-          <div className="mt-8 pt-8 border-t border-border text-center">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-4">
-              Don't have an account?
-            </p>
-            <Link href="/tourist/signup?mode=signup">
-              <Button variant="outline" className="w-full">
-                Create Account
-              </Button>
-            </Link>
+          {/* Divider */}
+          <div className="relative py-3">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-emerald-100 dark:border-slate-700"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-2 bg-white dark:bg-dark-surface text-gray-500 dark:text-gray-400">New to GUIDO?</span>
+            </div>
           </div>
-        </Card>
 
-        {/* Footer Link */}
-        <div className="mt-6 text-center">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="text-xs text-muted-foreground">
-              Back to Home
+          {/* Signup Link */}
+          <Link href="/tourist/signup?mode=signup">
+            <Button variant="outline" className="w-full h-10 sm:h-11 text-sm font-medium border-emerald-200 dark:border-slate-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800">
+              Create Tourist Account
             </Button>
           </Link>
-        </div>
+        </Card>
       </div>
     </div>
   );

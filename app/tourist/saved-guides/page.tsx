@@ -3,15 +3,23 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase-client';
-import { TouristSidebar } from '@/components/tourist-sidebar';
 import SavedGuidesComponent from '@/components/saved-guides';
+import ResponsiveContainer from '@/components/layouts/ResponsiveContainer';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function SavedGuidesPage() {
   const router = useRouter();
   const isMobile = useIsMobile();
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    localStorage.removeItem('tourist_id');
+    router.push('/');
+  };
 
   // Check authentication
   useEffect(() => {
@@ -32,9 +40,17 @@ export default function SavedGuidesPage() {
         }
 
         setUser(authUser);
+
+        // Fetch tourist profile
+        const { data: profileData } = await supabase
+          .from('tourist_profiles')
+          .select('*')
+          .eq('user_id', authUser.id)
+          .single();
+
+        if (profileData) setProfile(profileData);
       } catch (err) {
         console.error('Error checking auth:', err);
-        router.push('/tourist/login');
       } finally {
         setLoading(false);
       }
@@ -52,13 +68,9 @@ export default function SavedGuidesPage() {
   }
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <TouristSidebar />
+    <ResponsiveContainer>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+
           {/* Header */}
           <div className="mb-8 sm:mb-10">
             <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
@@ -73,8 +85,6 @@ export default function SavedGuidesPage() {
           <div>
             <SavedGuidesComponent />
           </div>
-        </div>
-      </div>
-    </div>
+    </ResponsiveContainer>
   );
 }

@@ -263,11 +263,11 @@ export default function GuideSignupPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center px-3 py-8">
-        <Card className="w-full max-w-md p-5 sm:p-6 text-center border border-border">
-          <CheckCircle2 className="w-12 h-12 sm:w-16 sm:h-16 text-green-600 mx-auto mb-3 sm:mb-4" />
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">Registration Successful!</h2>
-          <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
+      <div className="min-h-screen bg-cream-100 dark:bg-dark-bg flex items-center justify-center px-3 py-8">
+        <Card className="w-full max-w-md p-6 sm:p-8 text-center border border-emerald-200 dark:border-slate-700 bg-white dark:bg-dark-surface">
+          <CheckCircle2 className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-600 dark:text-emerald-400 mx-auto mb-4" />
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-dark-text mb-3">Registration Successful!</h2>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6">
             Verification pending by admin. You will receive an email or message at <br />
             <strong className="text-foreground">{formData.phone_number}</strong> or contact{' '}
             <strong className="text-foreground">9550574212</strong>
@@ -281,36 +281,36 @@ export default function GuideSignupPage() {
   // Step: Choice (New Registration vs Resubmit)
   if (step === 'choice') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-8 px-3">
+      <div className="min-h-screen bg-cream-100 dark:bg-dark-bg py-8 px-3">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-4 sm:mb-6">
+          <div className="mb-6">
             <Link href="/">
-              <Button variant="ghost" size="sm" className="text-xs sm:text-sm">← Back to Home</Button>
+              <Button variant="ghost" size="sm" className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">← Back to Home</Button>
             </Link>
           </div>
 
-          <Card className="border border-border p-5 sm:p-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Become a Guide</h1>
-            <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
+          <Card className="border border-emerald-200 dark:border-slate-700 p-6 sm:p-8 bg-white dark:bg-dark-surface">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-dark-text mb-2">Become a Guide</h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6">
               Choose an option to get started
             </p>
 
             <div className="space-y-3">
               <Button 
-                className="w-full h-24 sm:h-28 text-left flex flex-col items-start justify-start p-4 text-base sm:text-lg font-semibold"
+                className="w-full h-24 sm:h-28 text-left flex flex-col items-start justify-start p-4 text-base sm:text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
                 onClick={() => setStep('signup')}
               >
                 <span className="text-lg sm:text-2xl mb-1">✨ New Registration</span>
-                <span className="text-xs sm:text-sm font-normal text-muted-foreground">Register your application for the first time</span>
+                <span className="text-xs sm:text-sm font-normal text-emerald-50">Register your application for the first time</span>
               </Button>
 
               <Button 
                 variant="outline"
-                className="w-full h-24 sm:h-28 text-left flex flex-col items-start justify-start p-4 text-base sm:text-lg font-semibold border-2"
+                className="w-full h-24 sm:h-28 text-left flex flex-col items-start justify-start p-4 text-base sm:text-lg font-semibold border-2 border-emerald-200 dark:border-slate-600 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800"
                 onClick={() => setStep('login')}
               >
                 <span className="text-lg sm:text-2xl mb-1">🔄 Resubmit Application</span>
-                <span className="text-xs sm:text-sm font-normal text-muted-foreground">Your application was rejected? Update and resubmit</span>
+                <span className="text-xs sm:text-sm font-normal text-gray-600 dark:text-gray-400">Your application was rejected? Update and resubmit</span>
               </Button>
             </div>
           </Card>
@@ -322,28 +322,28 @@ export default function GuideSignupPage() {
   // Step: Login for Resubmission
   if (step === 'login') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-8 px-3">
+      <div className="min-h-screen bg-cream-100 dark:bg-dark-bg py-8 px-3">
         <div className="max-w-md mx-auto">
-          <div className="mb-4 sm:mb-6">
-            <Button variant="ghost" size="sm" onClick={() => setStep('choice')} className="text-xs sm:text-sm">← Back to Choice</Button>
+          <div className="mb-6">
+            <Button variant="ghost" size="sm" onClick={() => setStep('choice')} className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">← Back to Choice</Button>
           </div>
 
-          <Card className="border border-border p-5 sm:p-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Resubmit Application</h1>
-            <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
+          <Card className="border border-emerald-200 dark:border-slate-700 p-6 sm:p-8 bg-white dark:bg-dark-surface">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-dark-text mb-2">Resubmit Application</h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6">
               Sign in to update your application
             </p>
 
             {error && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
+              <Alert className="mb-4 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+                <AlertDescription className="text-red-700 dark:text-red-300 text-xs sm:text-sm">{error}</AlertDescription>
               </Alert>
             )}
 
-            <form onSubmit={handleResubmitLogin} className="space-y-3">
+            <form onSubmit={handleResubmitLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-xs sm:text-sm">Email</Label>
+                <Label htmlFor="email" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -352,12 +352,12 @@ export default function GuideSignupPage() {
                   onChange={(e) => setResubmitEmail(e.target.value)}
                   disabled={loading}
                   required
-                  className="text-sm"
+                  className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-xs sm:text-sm">Password</Label>
+                <Label htmlFor="password" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -366,11 +366,11 @@ export default function GuideSignupPage() {
                   onChange={(e) => setResubmitPassword(e.target.value)}
                   disabled={loading}
                   required
-                  className="text-sm"
+                  className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
                 />
               </div>
 
-              <Button type="submit" className="w-full text-sm" size="sm" disabled={loading}>
+              <Button type="submit" className="w-full h-11 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -381,16 +381,23 @@ export default function GuideSignupPage() {
                 )}
               </Button>
 
-              <p className="text-center text-muted-foreground text-xs sm:text-sm">
-                Changed your mind?{' '}
-                <button
-                  type="button"
-                  onClick={() => setStep('signup')}
-                  className="text-primary hover:underline"
-                >
-                  Register as new guide
-                </button>
-              </p>
+              <div className="relative py-3">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-emerald-100 dark:border-slate-700"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-white dark:bg-dark-surface text-gray-500 dark:text-gray-400">Or register new</span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStep('signup')}
+                className="w-full h-10 text-sm font-medium border-emerald-200 dark:border-slate-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800"
+              >
+                Register as New Guide
+              </Button>
             </form>
           </Card>
         </div>
@@ -427,29 +434,29 @@ export default function GuideSignupPage() {
 
   // Step: New Registration (Regular Signup)
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-8 px-3">
+    <div className="min-h-screen bg-cream-100 dark:bg-dark-bg py-8 px-3">
       <div className="max-w-2xl mx-auto">
-        <div className="mb-4">
-          <Button variant="ghost" size="sm" onClick={() => setStep('choice')} className="text-xs sm:text-sm">← Back to Choice</Button>
+        <div className="mb-6">
+          <Button variant="ghost" size="sm" onClick={() => setStep('choice')} className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">← Back to Choice</Button>
         </div>
 
-        <Card className="border border-border p-5 sm:p-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Become a Guide</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mb-5 sm:mb-6">
+        <Card className="border border-emerald-200 dark:border-slate-700 p-6 sm:p-8 bg-white dark:bg-dark-surface">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-dark-text mb-2">Become a Guide</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6">
             Register and get verified by our admin team
           </p>
 
           {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4 flex-shrink-0" />
-              <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
+            <Alert className="mb-4 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+              <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+              <AlertDescription className="text-red-700 dark:text-red-300 text-xs sm:text-sm">{error}</AlertDescription>
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-xs sm:text-sm">Full Name *</Label>
+              <Label htmlFor="name" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Full Name *</Label>
               <Input
                 id="name"
                 name="name"
@@ -459,13 +466,13 @@ export default function GuideSignupPage() {
                 onChange={handleInputChange}
                 disabled={loading}
                 required
-                className="text-sm"
+                className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
               />
             </div>
 
             {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs sm:text-sm">Email *</Label>
+              <Label htmlFor="email" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Email *</Label>
               <Input
                 id="email"
                 name="email"
@@ -475,13 +482,13 @@ export default function GuideSignupPage() {
                 onChange={handleInputChange}
                 disabled={loading}
                 required
-                className="text-sm"
+                className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
               />
             </div>
 
             {/* Password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-xs sm:text-sm">Password *</Label>
+              <Label htmlFor="password" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Password *</Label>
               <Input
                 id="password"
                 name="password"
@@ -491,14 +498,14 @@ export default function GuideSignupPage() {
                 onChange={handleInputChange}
                 disabled={loading}
                 required
-                className="text-sm"
+                className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
               />
-              <p className="text-xs text-muted-foreground">Min 6 characters. Use to login after approval.</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Min 6 characters. Use to login after approval.</p>
             </div>
 
             {/* Phone */}
             <div className="space-y-2">
-              <Label htmlFor="phone_number" className="text-xs sm:text-sm">Phone Number *</Label>
+              <Label htmlFor="phone_number" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number *</Label>
               <Input
                 id="phone_number"
                 name="phone_number"
@@ -508,13 +515,13 @@ export default function GuideSignupPage() {
                 onChange={handleInputChange}
                 disabled={loading}
                 required
-                className="text-sm"
+                className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
               />
             </div>
 
             {/* Location */}
             <div className="space-y-2">
-              <Label htmlFor="location" className="text-xs sm:text-sm">Full Address *</Label>
+              <Label htmlFor="location" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Full Address *</Label>
               <LocationAutocomplete
                 value={formData.location}
                 onChange={(value) => setFormData((prev) => ({ ...prev, location: value }))}
@@ -538,8 +545,8 @@ export default function GuideSignupPage() {
 
             {/* Profile Picture */}
             <div className="space-y-2">
-              <Label htmlFor="profile_picture" className="text-xs sm:text-sm">Profile Picture *</Label>
-              <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:bg-muted/50 transition-colors cursor-pointer">
+              <Label htmlFor="profile_picture" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture *</Label>
+              <div className="border-2 border-dashed border-emerald-200 dark:border-slate-600 rounded-lg p-4 text-center hover:bg-emerald-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
                 <input
                   id="profile_picture"
                   type="file"
@@ -560,13 +567,13 @@ export default function GuideSignupPage() {
                         alt="Profile preview"
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg mb-2"
                       />
-                      <p className="text-xs sm:text-sm text-muted-foreground">Click to change</p>
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Click to change</p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center">
-                      <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground mb-1" />
-                      <p className="text-xs sm:text-sm font-medium text-foreground">Upload Profile Picture</p>
-                      <p className="text-xs text-muted-foreground">JPG, PNG (Max 5MB)</p>
+                      <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 dark:text-gray-600 mb-2" />
+                      <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Upload Profile Picture</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">JPG, PNG (Max 5MB)</p>
                     </div>
                   )}
                 </label>
@@ -575,16 +582,16 @@ export default function GuideSignupPage() {
 
             {/* Document Type */}
             <div className="space-y-2">
-              <Label htmlFor="document_type" className="text-xs sm:text-sm">Document Type *</Label>
+              <Label htmlFor="document_type" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Document Type *</Label>
               <Select
                 value={formData.document_type}
                 onValueChange={handleDocumentTypeChange}
                 disabled={loading}
               >
-                <SelectTrigger id="document_type" className="text-sm">
+                <SelectTrigger id="document_type" className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text focus:border-emerald-500 dark:focus:border-emerald-400">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-dark-surface border-emerald-200 dark:border-slate-700">
                   <SelectItem value="aadhar">Aadhar Card</SelectItem>
                   <SelectItem value="driving_licence">Driving License</SelectItem>
                 </SelectContent>
@@ -593,10 +600,10 @@ export default function GuideSignupPage() {
 
             {/* Document Upload */}
             <div className="space-y-2">
-              <Label htmlFor="document" className="text-xs sm:text-sm">
+              <Label htmlFor="document" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                 {formData.document_type === 'aadhar' ? 'Aadhar Card' : 'Driving License'} *
               </Label>
-              <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:bg-muted/50 transition-colors cursor-pointer">
+              <div className="border-2 border-dashed border-emerald-200 dark:border-slate-600 rounded-lg p-4 text-center hover:bg-emerald-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
                 <input
                   id="document"
                   type="file"
@@ -617,13 +624,13 @@ export default function GuideSignupPage() {
                         alt="Document preview"
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg mb-2"
                       />
-                      <p className="text-xs sm:text-sm text-muted-foreground">Click to change</p>
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Click to change</p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center">
-                      <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground mb-1" />
-                      <p className="text-xs sm:text-sm font-medium text-foreground">Upload Document</p>
-                      <p className="text-xs text-muted-foreground">JPG, PNG (Max 5MB)</p>
+                      <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 dark:text-gray-600 mb-2" />
+                      <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Upload Document</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">JPG, PNG (Max 5MB)</p>
                     </div>
                   )}
                 </label>
@@ -631,7 +638,7 @@ export default function GuideSignupPage() {
             </div>
 
             {/* Submit Button */}
-            <Button type="submit" className="w-full text-sm" size="sm" disabled={loading}>
+            <Button type="submit" className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -642,12 +649,20 @@ export default function GuideSignupPage() {
               )}
             </Button>
 
-            <p className="text-center text-muted-foreground text-xs sm:text-sm">
-              Already have an account?{' '}
-              <Link href="/guide/login" className="text-primary hover:underline">
-                Login here
-              </Link>
-            </p>
+            <div className="relative py-3">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-emerald-100 dark:border-slate-700"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-2 bg-white dark:bg-dark-surface text-gray-500 dark:text-gray-400">Already have an account?</span>
+              </div>
+            </div>
+
+            <Link href="/guide/login">
+              <Button variant="outline" className="w-full h-10 sm:h-11 text-sm font-medium border-emerald-200 dark:border-slate-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800">
+                Sign In Here
+              </Button>
+            </Link>
           </form>
         </Card>
       </div>

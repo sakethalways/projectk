@@ -75,17 +75,17 @@ export default function AdminLoginModal({ open, onOpenChange }: AdminLoginModalP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px]">
+      <DialogContent className="sm:max-w-[400px] bg-white dark:bg-dark-surface border border-emerald-200 dark:border-slate-700">
         <DialogHeader>
-          <DialogTitle>Admin Access</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-2xl text-gray-900 dark:text-dark-text">Admin Access</DialogTitle>
+          <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
             Enter your admin credentials to access the dashboard
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Email</Label>
             <Input
               id="email"
               type="email"
@@ -94,11 +94,12 @@ export default function AdminLoginModal({ open, onOpenChange }: AdminLoginModalP
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
               required
+              className="h-10 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Password</Label>
             <Input
               id="password"
               type="password"
@@ -107,12 +108,13 @@ export default function AdminLoginModal({ open, onOpenChange }: AdminLoginModalP
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
               required
+              className="h-10 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
             />
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>}
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full h-10 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

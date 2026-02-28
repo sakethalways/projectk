@@ -115,42 +115,49 @@ export default function GuideLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center py-6 sm:py-8 px-3 sm:px-6">
+    <div className="min-h-screen bg-cream-100 dark:bg-dark-bg flex items-center justify-center py-6 sm:py-8 px-3 sm:px-6">
       <div className="w-full max-w-md">
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-6 sm:mb-8">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="text-xs sm:text-sm">← Back to Home</Button>
+            <Button variant="ghost" size="sm" className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">
+              ← Back to Home
+            </Button>
           </Link>
         </div>
 
-        <Card className="border border-border p-5 sm:p-7 lg:p-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 sm:mb-2">Guide Login</h1>
-          <p className="text-xs sm:text-sm lg:text-base text-muted-foreground mb-5 sm:mb-7">
-            Access your dashboard
+        <Card className="border border-emerald-200 dark:border-slate-700 p-6 sm:p-8 bg-white dark:bg-dark-surface shadow-lg">
+          <div className="mb-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mb-4 flex-shrink-0">
+              <span className="text-white font-bold text-lg">G</span>
+            </div>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-dark-text mb-2">Guide Login</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            Access your guide dashboard
           </p>
 
           {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
+            <Alert variant="destructive" className="mb-4 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+              <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+              <AlertDescription className="text-red-700 dark:text-red-300 text-xs sm:text-sm">{error}</AlertDescription>
             </Alert>
           )}
 
           {statusType === 'pending' && (
-            <Alert className="mb-4 border-yellow-200 bg-yellow-50 dark:bg-yellow-950">
-              <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
-              <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-xs sm:text-sm">
+            <Alert className="mb-4 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30">
+              <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <AlertDescription className="text-amber-700 dark:text-amber-300 text-xs sm:text-sm">
                 {statusMessage}
               </AlertDescription>
             </Alert>
           )}
 
           {statusType === 'rejected' && (
-            <Alert variant="destructive" className="mb-4">
-              <XCircle className="h-4 w-4 flex-shrink-0" />
-              <AlertDescription className="text-xs sm:text-sm mb-2">{statusMessage}</AlertDescription>
+            <Alert className="mb-4 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+              <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+              <AlertDescription className="text-red-700 dark:text-red-300 text-xs sm:text-sm mb-3">{statusMessage}</AlertDescription>
               <Link href="/guide/signup">
-                <Button variant="outline" size="sm" className="mt-2 text-xs sm:text-sm">
+                <Button variant="outline" size="sm" className="mt-2 text-xs sm:text-sm h-9 border-red-300 text-red-600 dark:border-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50">
                   Resubmit Application
                 </Button>
               </Link>
@@ -158,15 +165,15 @@ export default function GuideLoginPage() {
           )}
 
           {statusType === 'deactivated' && (
-            <Alert variant="destructive" className="mb-4">
-              <XCircle className="h-4 w-4 flex-shrink-0" />
-              <AlertDescription className="text-xs sm:text-sm">{statusMessage}</AlertDescription>
+            <Alert className="mb-4 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+              <XCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+              <AlertDescription className="text-red-700 dark:text-red-300 text-xs sm:text-sm">{statusMessage}</AlertDescription>
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs sm:text-sm">Email</Label>
+              <Label htmlFor="email" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</Label>
               <Input
                 id="email"
                 type="email"
@@ -175,12 +182,12 @@ export default function GuideLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
                 required
-                className="text-sm"
+                className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-xs sm:text-sm">Password</Label>
+              <Label htmlFor="password" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -189,11 +196,11 @@ export default function GuideLoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
                 required
-                className="text-sm"
+                className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
               />
             </div>
 
-            <Button type="submit" className="w-full text-xs sm:text-sm" disabled={loading} size="sm">
+            <Button type="submit" className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -204,12 +211,20 @@ export default function GuideLoginPage() {
               )}
             </Button>
 
-            <p className="text-center text-muted-foreground text-xs sm:text-sm">
-              Don't have an account?{' '}
-              <Link href="/guide/signup" className="text-primary hover:underline">
-                Register here
-              </Link>
-            </p>
+            <div className="relative py-3">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-emerald-100 dark:border-slate-700"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-2 bg-white dark:bg-dark-surface text-gray-500 dark:text-gray-400">New to GUIDO?</span>
+              </div>
+            </div>
+
+            <Link href="/guide/signup" className="block">
+              <Button type="button" variant="outline" className="w-full h-10 sm:h-11 text-sm font-medium border-emerald-200 dark:border-slate-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800">
+                Create Your Guide Account
+              </Button>
+            </Link>
           </form>
         </Card>
       </div>

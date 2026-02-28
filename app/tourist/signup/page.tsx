@@ -298,12 +298,12 @@ function TouristSignupContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800 py-8 px-3 sm:px-6 flex flex-col justify-center">
+    <div className="min-h-screen bg-cream-100 dark:bg-dark-bg py-8 px-3 sm:px-6 flex flex-col justify-center">
       <div className="max-w-2xl mx-auto w-full">
         {/* Back Button */}
         <div className="mb-8">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="text-xs sm:text-sm">
+            <Button variant="ghost" size="sm" className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">
               ← Back to Home
             </Button>
           </Link>
@@ -348,14 +348,14 @@ function TouristSignupContent() {
               <Card className="border border-slate-200 dark:border-slate-700 p-8 bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                 onClick={() => setStep('login')}>
                 <div className="text-center">
-                  <div className="inline-block mb-4 p-3 bg-slate-100 dark:bg-slate-700 rounded-full">
-                    <Lock className="w-6 h-6 text-slate-600 dark:text-slate-400" />
+                  <div className="inline-block mb-4 p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full">
+                    <Lock className="w-6 h-6 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-foreground mb-2">Sign In</h2>
-                  <p className="text-sm text-muted-foreground mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-dark-text mb-2">Sign In</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                     Already have an account? Welcome back
                   </p>
-                  <Button variant="outline" className="w-full">
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
                     Sign In
                   </Button>
                 </div>
@@ -366,86 +366,78 @@ function TouristSignupContent() {
 
         {/* Signup Step */}
         {step === 'signup' && !submitted && (
-          <Card className="border border-emerald-200 dark:border-emerald-800 p-8 bg-white dark:bg-slate-800 shadow-lg">
+          <Card className="border border-emerald-200 dark:border-slate-700 p-8 bg-white dark:bg-dark-surface shadow-lg">
             <div className="mb-8">
               <button
                 onClick={() => setStep('choice')}
-                className="mb-4 inline-flex items-center text-xs sm:text-sm text-muted-foreground hover:text-foreground"
+                className="mb-4 inline-flex items-center text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400"
               >
                 ← Back
               </button>
-              <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-dark-text mb-2">
                 Create Your Account
               </h1>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Join GuideVerify and start exploring with verified guides
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                Join GUIDO and start exploring with verified guides
               </p>
             </div>
 
             {error && (
-              <Alert variant="destructive" className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+              <Alert className="mb-6 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30">
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+                <AlertDescription className="text-red-700 dark:text-red-300">{error}</AlertDescription>
               </Alert>
             )}
 
-            <form onSubmit={handleSignup} className="space-y-6">
+            <form onSubmit={handleSignup} className="space-y-4">
               {/* Name */}
-              <div>
-                <Label className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <Mail className="w-4 h-4" /> Full Name
-                </Label>
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</Label>
                 <Input
                   name="name"
                   type="text"
                   value={formData.name}
                   onChange={handleInputChange}
                   placeholder="John Doe"
-                  className="text-sm"
+                  className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
                   disabled={loading}
                 />
               </div>
 
               {/* Email */}
-              <div>
-                <Label className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <Mail className="w-4 h-4" /> Email
-                </Label>
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Email</Label>
                 <Input
                   name="email"
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="your@email.com"
-                  className="text-sm"
+                  className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
                   disabled={loading}
                 />
               </div>
 
               {/* Password */}
-              <div>
-                <Label className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <Lock className="w-4 h-4" /> Password
-                </Label>
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Password</Label>
                 <Input
                   name="password"
                   type="password"
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="Min 5 characters"
-                  className="text-sm"
+                  className="h-10 sm:h-11 text-sm border-emerald-200 dark:border-slate-600 bg-cream-50 dark:bg-slate-800 text-gray-900 dark:text-dark-text placeholder-gray-400 dark:placeholder-gray-500 focus:border-emerald-500 dark:focus:border-emerald-400"
                   disabled={loading}
                 />
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Must be at least 5 characters
                 </p>
               </div>
 
               {/* Phone */}
-              <div>
-                <Label className="text-sm font-semibold mb-2 flex items-center gap-2">
-                  <Phone className="w-4 h-4" /> Phone Number
-                </Label>
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</Label>
                 <Input
                   name="phone_number"
                   type="tel"
